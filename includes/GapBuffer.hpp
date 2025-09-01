@@ -40,11 +40,20 @@ public:
 	char	&operator[](size_t index) const;
 
 	void	relocateGapTo(size_t index);
-	
+
 	//Getters
 	std::string	getVisibleText() const;
-	
+	size_t		getGapSize() const;
+
 	//Writing
 	void	insert(char ch);
 	void	remove();
+
+	class GapBufferException: public std::exception
+	{
+	private:
+
+	public:
+		virtual const char* what() const noexcept;
+	};
 };

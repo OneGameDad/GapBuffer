@@ -1,6 +1,4 @@
 #include "../includes/GapBuffer.hpp"
-#include <cassert>
-#include <cstddef>
 
 GapBuffer::GapBuffer()
 	: bufferSize_(STARTING_BUFFER_SIZE), gapStart_(0), gapSize_(STARTING_GAP_SIZE), filledIndices_(0), lastIndex_(0)
@@ -69,16 +67,21 @@ void	GapBuffer::calculateFilledIndices()
 	filledIndices_ = headSize + tailSize;
 }
 
-void	GapBuffer::calculateLastIndex()//TODO why do I need to know last index?
+void	GapBuffer::calculateLastIndex()//Use this to check if repositioning gap is going past the last element
 {
-	//last tail index is ?
+	size_t headSize = 0;
+	if (gapStart_ != 0)
+		headSize = gapStart_ - 1;
 	size_t tailSize = 0;
 	for (size_t i = gapEnd_ + 1; i < bufferSize_; i++)
 	{
 		if (buffer_[i] != 0)
 			tailSize++;
 	}
-	lastIndex_ = tailSize;//But this doesn't take into account gap size, does it need to?
+	if (tailSize != 0)
+		lastIndex_ = tailSize;
+	else
+		lastIndex_ = headSize;
 }
 
 void	GapBuffer::insert(char ch)
@@ -90,19 +93,40 @@ void	GapBuffer::insert(char ch)
 	}
 	assert(gapStart_ < bufferSize_);
 	buffer_[gapStart_] = ch;
+	relocateGapTo(gapStart_ + 1);
 	calculateGapSize();
 	calculateFilledIndices();
-	//TODO lastIndex_
+	calculateLastIndex();
 }
 
 void	GapBuffer::remove()
 {
 	if (gapStart_ == 0 || filledIndices_ == 0)
 		return ;
-	gapStart_--;
+	relocateGapTo(gapStart_ - 1);
 	calculateGapSize();
 	calculateFilledIndices();
-	//TODO lastIndex_
+	calculateLastIndex();
+}
+
+void GapBuffer::relocateGapTo(size_t index)
+{
+	if (index == gapStart_)
+		return ;
+	if (index < gapStart_)
+	{
+		calculateLastIndex();
+		if (index > lastIndex_ && lastIndex_ < gapStart_)
+			index = lastIndex_ + 1;
+		//TODO move backward?
+	}
+	else if (index > gapStart_)
+	{
+		calculateLastIndex();
+		if (index > lastIndex_)
+			index = lastIndex_ + 1;
+		//TODO move forward?
+	}
 }
 
 std::string	GapBuffer::getVisibleText() const
@@ -122,5 +146,7 @@ std::string	GapBuffer::getVisibleText() const
 		count++;
 	}
 	std::cout << "Filled Indices: " << filledIndices_ << " & Counted characters: " << count << std::endl;
+	if (count != filledIndices_)
+		throw GapBufferException::what("The number of filled Indices does not match the number of visible characters");
 	return (visible);
 }
