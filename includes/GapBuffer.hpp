@@ -25,12 +25,19 @@ private:
 	//Buffer
 	bool	isBufferFull();
 	void	resizeBuffer();
+	void	setBuffer(size_t index, char ch);
+	void	recalculateDerivedInfo();
 
 	//Gap
 	void	calculateGapEnd();
 	void	calculateGapSize();
 	void	calculateFilledIndices();
 	void	calculateLastIndex();
+	void	relocateGapTo(size_t index);
+	void	resizeGap();
+	void	shrinkGap();
+	void	growGap();
+	void	cleanGap();
 public:
 	GapBuffer();
 	~GapBuffer();
@@ -39,7 +46,6 @@ public:
 	char	&operator[](size_t index);
 	char	&operator[](size_t index) const;
 
-	void	relocateGapTo(size_t index);
 
 	//Getters
 	std::string	getVisibleText() const;

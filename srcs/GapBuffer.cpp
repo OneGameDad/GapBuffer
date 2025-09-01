@@ -1,4 +1,5 @@
 #include "../includes/GapBuffer.hpp"
+#include <cstddef>
 
 GapBuffer::GapBuffer()
 	: bufferSize_(STARTING_BUFFER_SIZE), gapStart_(0), gapSize_(STARTING_GAP_SIZE), filledIndices_(0), lastIndex_(0)
@@ -42,6 +43,12 @@ bool	GapBuffer::isBufferFull()
 	return (gapSize_ == 0);
 }
 
+void	GapBuffer::resizeBuffer()
+{
+	//TODO maybe set a resize value 1024bytes per time
+	//could track usage data to see how often it occurs
+}
+
 void	GapBuffer::calculateGapEnd()
 {
 	gapEnd_ = gapStart_ + gapSize_ - 1;
@@ -57,7 +64,9 @@ void	GapBuffer::calculateGapSize()
 
 void	GapBuffer::calculateFilledIndices()
 {
-	size_t headSize = gapStart_ - 1;
+	size_t headSize = 0;
+	if (gapStart_ != 0)
+		headSize = gapStart_ - 1;
 	size_t tailSize = 0;
 	for (size_t i = gapEnd_ + 1; i < bufferSize_; i++)
 	{
@@ -65,6 +74,7 @@ void	GapBuffer::calculateFilledIndices()
 			tailSize++;
 	}
 	filledIndices_ = headSize + tailSize;
+	//TODO maybe add a resize buffer here if filledIndices == bufferSize_
 }
 
 void	GapBuffer::calculateLastIndex()//Use this to check if repositioning gap is going past the last element
@@ -82,6 +92,20 @@ void	GapBuffer::calculateLastIndex()//Use this to check if repositioning gap is 
 		lastIndex_ = tailSize;
 	else
 		lastIndex_ = headSize;
+	//TODO maybe add a resize buffer here if filledIndices == bufferSize_
+}
+
+void	GapBuffer::recalculateDerivedInfo()
+{
+	calculateGapSize();
+	calculateFilledIndices();
+	calculateLastIndex();
+}
+
+void	GapBuffer::setBuffer(size_t index, char ch)
+{
+	buffer_[index] = ch;
+	shrinkGap();
 }
 
 void	GapBuffer::insert(char ch)
@@ -92,25 +116,19 @@ void	GapBuffer::insert(char ch)
 		relocateGapTo(gapStart_);
 	}
 	assert(gapStart_ < bufferSize_);
-	buffer_[gapStart_] = ch;
-	relocateGapTo(gapStart_ + 1);
-	calculateGapSize();
-	calculateFilledIndices();
-	calculateLastIndex();
+	setBuffer(gapStart_, ch);
 }
 
 void	GapBuffer::remove()
 {
 	if (gapStart_ == 0 || filledIndices_ == 0)
 		return ;
-	relocateGapTo(gapStart_ - 1);
-	calculateGapSize();
-	calculateFilledIndices();
-	calculateLastIndex();
+	growGap();
 }
 
 void GapBuffer::relocateGapTo(size_t index)
 {
+	//TODO when moving the gapSize_ needs to be restored to a minimum size
 	if (index == gapStart_)
 		return ;
 	if (index < gapStart_)
@@ -127,6 +145,40 @@ void GapBuffer::relocateGapTo(size_t index)
 			index = lastIndex_ + 1;
 		//TODO move forward?
 	}
+}
+
+void	GapBuffer::resizeGap()
+{
+	if (gapSize_ == 0)
+	{
+		gapSize_ = STARTING_GAP_SIZE;
+		if (gapSize_ >= bufferSize_)
+			resizeBuffer();//TODO complete function
+		//TODO check if there's anything in the tail if yes, move everything after gapEnd_ so gapEnd_
+		else
+			calculateGapEnd();
+	}
+}
+
+void	GapBuffer::shrinkGap()
+{
+	gapStart_++;
+	recalculateDerivedInfo();
+	if (gapSize_ == 0)
+		resizeGap();
+}
+
+void	GapBuffer::growGap()
+{
+	gapStart_--;
+	recalculateDerivedInfo();
+	cleanGap();
+}
+
+void	GapBuffer::cleanGap()
+{
+	for (size_t i = gapStart_; i < gapSize_; i++)
+		buffer_[i] = 0;
 }
 
 std::string	GapBuffer::getVisibleText() const
