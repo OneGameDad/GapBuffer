@@ -74,7 +74,7 @@ void	GapBuffer::calculateFilledIndices()
 			tailSize++;
 	}
 	filledIndices_ = headSize + tailSize;
-	//TODO maybe add a resize buffer here if filledIndices == bufferSize_
+	//TODO maybe add a resize buffer here if filledIndices == bufferSize_ - 1
 }
 
 void	GapBuffer::calculateLastIndex()//Use this to check if repositioning gap is going past the last element
@@ -92,7 +92,7 @@ void	GapBuffer::calculateLastIndex()//Use this to check if repositioning gap is 
 		lastIndex_ = tailSize;
 	else
 		lastIndex_ = headSize;
-	//TODO maybe add a resize buffer here if filledIndices == bufferSize_
+	//TODO maybe add a resize buffer here if lastIndex == bufferSize_ - 1
 }
 
 void	GapBuffer::recalculateDerivedInfo()
