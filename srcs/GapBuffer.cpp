@@ -1,4 +1,5 @@
 #include "../includes/GapBuffer.hpp"
+#include <algorithm>
 #include <cstddef>
 
 GapBuffer::GapBuffer()
@@ -45,8 +46,24 @@ bool	GapBuffer::isBufferFull()
 
 void	GapBuffer::resizeBuffer()
 {
-	//TODO maybe set a resize value 1024bytes per time
-	//could track usage data to see how often it occurs
+	size_t used = gapStart_ + (bufferSize_ - (gapEnd_ + 1));
+	size_t newBufferSize = (bufferSize_ == STARTING_BUFFER_SIZE) ? STARTING_BUFFER_SIZE : bufferSize_ * 2;
+	while (newBufferSize <= used)
+		newBufferSize *= 2;
+	size_t newGapSize = newBufferSize - used;
+
+	char* newBuffer = new char[newBufferSize];
+	std::copy(buffer_, buffer_ + gapStart_, newBuffer),
+	std::copy(buffer_ + gapEnd_ + 1, buffer_ + bufferSize_, newBuffer + gapStart_ + newGapSize);
+	std::fill(newBuffer + gapStart_, newBuffer + gapStart_ + newGapSize, 0);
+	
+	delete [] buffer_;
+	buffer_ = newBuffer;
+	bufferSize_ = newBufferSize;
+	gapEnd_ = newGapSize;
+	calculateGapSize();
+	calculateFilledIndices();
+	calculateLastIndex();
 }
 
 void	GapBuffer::calculateGapEnd()
@@ -74,10 +91,11 @@ void	GapBuffer::calculateFilledIndices()
 			tailSize++;
 	}
 	filledIndices_ = headSize + tailSize;
-	//TODO maybe add a resize buffer here if filledIndices == bufferSize_ - 1
+	if (filledIndices_ == bufferSize_ - 1)
+		resizeBuffer();
 }
 
-void	GapBuffer::calculateLastIndex()//Use this to check if repositioning gap is going past the last element
+void	GapBuffer::calculateLastIndex()
 {
 	size_t headSize = 0;
 	if (gapStart_ != 0)
@@ -92,7 +110,8 @@ void	GapBuffer::calculateLastIndex()//Use this to check if repositioning gap is 
 		lastIndex_ = tailSize;
 	else
 		lastIndex_ = headSize;
-	//TODO maybe add a resize buffer here if lastIndex == bufferSize_ - 1
+	if (lastIndex_ == bufferSize_ - 1)
+		resizeBuffer();
 }
 
 void	GapBuffer::recalculateDerivedInfo()
@@ -136,25 +155,44 @@ void GapBuffer::relocateGapTo(size_t index)
 		calculateLastIndex();
 		if (index > lastIndex_ && lastIndex_ < gapStart_)
 			index = lastIndex_ + 1;
-		//TODO move backward?
+		std::move_backward(buffer_ + index,
+		     buffer_ + gapStart_, 
+		     buffer_ + gapStart_ + gapSize_ - 1);
+		gapStart_ = index;
+		calculateGapEnd();
 	}
 	else if (index > gapStart_)
 	{
 		calculateLastIndex();
 		if (index > lastIndex_)
 			index = lastIndex_ + 1;
-		//TODO move forward?
+		std::move(buffer_ + gapEnd_ + 1,
+			buffer_ + gapEnd_ + 1 + (index - gapStart_),
+			buffer_ + gapStart_);
+		gapStart_ = index;
+		calculateGapEnd();
 	}
+	cleanGap();
 }
 
+bool	GapBuffer::isTailEmpty()
+{
+	for (size_t i = gapEnd_ + 1; i < bufferSize_; i++)
+	{
+		if (buffer_[i] != 0)
+			return (false);
+	}
+	return (true);
+}
 void	GapBuffer::resizeGap()
 {
 	if (gapSize_ == 0)
 	{
 		gapSize_ = STARTING_GAP_SIZE;
-		if (gapSize_ >= bufferSize_)
-			resizeBuffer();//TODO complete function
-		//TODO check if there's anything in the tail if yes, move everything after gapEnd_ so gapEnd_
+		if (gapStart_ + gapSize_ >= bufferSize_)
+			resizeBuffer();
+		if (!isTailEmpty())
+			//TODO move everything after gapEnd_ so gapEnd_
 		else
 			calculateGapEnd();
 	}
@@ -177,8 +215,7 @@ void	GapBuffer::growGap()
 
 void	GapBuffer::cleanGap()
 {
-	for (size_t i = gapStart_; i < gapSize_; i++)
-		buffer_[i] = 0;
+	std::fill(buffer_ + gapStart_, buffer_ + gapEnd_ + 1, 0);
 }
 
 std::string	GapBuffer::getVisibleText() const

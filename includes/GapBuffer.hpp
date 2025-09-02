@@ -27,6 +27,7 @@ private:
 	void	resizeBuffer();
 	void	setBuffer(size_t index, char ch);
 	void	recalculateDerivedInfo();
+	bool	isTailEmpty();
 
 	//Gap
 	void	calculateGapEnd();
