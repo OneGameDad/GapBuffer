@@ -1,6 +1,7 @@
 #include "../includes/GapBuffer.hpp"
 #include <algorithm>
 #include <cstddef>
+#include <cstring>
 
 GapBuffer::GapBuffer()
 	: bufferSize_(STARTING_BUFFER_SIZE), gapStart_(0), gapSize_(STARTING_GAP_SIZE), filledIndices_(0), lastIndex_(0)
@@ -73,10 +74,10 @@ void	GapBuffer::calculateGapEnd()
 
 void	GapBuffer::calculateGapSize()
 {
-	if (gapEnd_ >= gapStart_)
+	if (gapEnd_ > gapStart_)
 		gapSize_ = gapEnd_ - gapStart_ + 1;
 	else
-		gapSize_ = 0;
+		resizeGap();
 }
 
 void	GapBuffer::calculateFilledIndices()
@@ -155,7 +156,7 @@ void GapBuffer::relocateGapTo(size_t index)
 		calculateLastIndex();
 		if (index > lastIndex_ && lastIndex_ < gapStart_)
 			index = lastIndex_ + 1;
-		std::move_backward(buffer_ + index,
+		std::copy_backward(buffer_ + index,
 		     buffer_ + gapStart_, 
 		     buffer_ + gapStart_ + gapSize_ - 1);
 		gapStart_ = index;
@@ -166,7 +167,7 @@ void GapBuffer::relocateGapTo(size_t index)
 		calculateLastIndex();
 		if (index > lastIndex_)
 			index = lastIndex_ + 1;
-		std::move(buffer_ + gapEnd_ + 1,
+		std::copy(buffer_ + gapEnd_ + 1,
 			buffer_ + gapEnd_ + 1 + (index - gapStart_),
 			buffer_ + gapStart_);
 		gapStart_ = index;
@@ -184,17 +185,25 @@ bool	GapBuffer::isTailEmpty()
 	}
 	return (true);
 }
+
 void	GapBuffer::resizeGap()
 {
 	if (gapSize_ == 0)
 	{
-		gapSize_ = STARTING_GAP_SIZE;
-		if (gapStart_ + gapSize_ >= bufferSize_)
+		size_t newGapSize = STARTING_GAP_SIZE;
+		if (gapStart_ + newGapSize >= bufferSize_)
+		{
 			resizeBuffer();
-		if (!isTailEmpty())
-			//TODO move everything after gapEnd_ so gapEnd_
-		else
-			calculateGapEnd();
+			return ;
+		}
+		else if (!isTailEmpty())
+		{
+			size_t tailSize = bufferSize_ - gapEnd_;
+			memmove(&buffer_[gapEnd_ + newGapSize], &buffer_[gapEnd_], tailSize);
+			gapEnd_ += newGapSize;
+			calculateGapSize();
+			cleanGap();
+		}
 	}
 }
 
