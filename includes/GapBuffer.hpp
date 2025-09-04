@@ -7,6 +7,7 @@
 #include <exception>
 #include <string>
 #include <iostream>
+#include <filesystem>
 
 #define STARTING_BUFFER_SIZE	1024
 #define STARTING_GAP_SIZE	64
@@ -55,6 +56,10 @@ public:
 	//Writing
 	void	insert(char ch);
 	void	remove();
+	void	setCursorPosition(size_t index);
+
+	//Saving
+	void	saveVisibleText(std::filesystem::path &filename) const;
 
 	class GapBufferException: public std::exception
 	{

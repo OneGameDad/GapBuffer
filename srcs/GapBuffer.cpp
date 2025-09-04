@@ -178,7 +178,7 @@ void GapBuffer::relocateGapTo(size_t index)
 
 bool	GapBuffer::isTailEmpty()
 {
-	for (size_t i = gapEnd_ + 1; i < bufferSize_; i++)
+	for (size_t i = gapEnd_; i < bufferSize_; i++)
 	{
 		if (buffer_[i] != 0)
 			return (false);
@@ -247,4 +247,14 @@ std::string	GapBuffer::getVisibleText() const
 	if (count != filledIndices_)
 		throw GapBufferException::what("The number of filled Indices does not match the number of visible characters");
 	return (visible);
+}
+
+void	GapBuffer::setCursorPosition(size_t index)
+{
+	if (index < gapStart_)
+		relocateGapTo(index);
+	else if (index > filledIndices_ + gapSize_)
+		relocateGapTo(filledIndices_ + gapSize_ + 1);
+	else if (index >= gapStart_)
+		//TODO figure out how far past the gapEnd_ to put the index
 }
