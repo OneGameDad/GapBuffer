@@ -21,19 +21,19 @@ WHITE := \033[0;97m
 CC := g++
 RM := rm -rf
 
-SRCS_FILES := main.cpp gap_buffer.cpp
+SRCS_FILES := main.cpp GapBuffer.cpp
 
 # Detect Platform
 UNAME_S := $(shell uname -s)
 
 ifeq ($(OS),Windows_NT)
-	NAME := hyper-bol-e.exe
+	NAME := gap_buffer.exe
 	PLATFORM = WINDOWS
 	CXX = g++
 	CXXFLAGS = -Wall -Werror -Wextra -std=c++20 $(DEPFLAGS) #-Ilib/raylib/src
 	LDFLAGS = -lraylib -lfreetype -lopengl32 -lgdi32 -lwinmm #-Llib/raylib/src
 else ifeq ($(UNAME_S),Linux)
-	NAME := hyper-bol-e
+	NAME := gap_buffer
 	PLATFORM = LINUX
 	CXX = g++
 	CXXFLAGS := -Wall -Wextra -Werror -std=c++20 $(DEPFLAGS) -I/usr/include/freetype2 #-Ilib/raylib/src

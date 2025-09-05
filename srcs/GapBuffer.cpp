@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
+#include <iostream>
+#include <stdexcept>
 
 GapBuffer::GapBuffer()
 	: bufferSize_(STARTING_BUFFER_SIZE), gapStart_(0), gapSize_(STARTING_GAP_SIZE), filledIndices_(0), lastIndex_(0)
@@ -98,11 +100,11 @@ void	GapBuffer::calculateFilledIndices()
 
 void	GapBuffer::calculateLastIndex()
 {
-	size_t headSize = 0;
+/*	size_t headSize = 0;
 	if (gapStart_ != 0)
-		headSize = gapStart_ - 1;
+		headSize = gapStart_;
 	size_t tailSize = 0;
-	for (size_t i = gapEnd_ + 1; i < bufferSize_; i++)
+	for (size_t i = gapEnd_; i < bufferSize_; i++)
 	{
 		if (buffer_[i] != 0)
 			tailSize++;
@@ -113,6 +115,11 @@ void	GapBuffer::calculateLastIndex()
 		lastIndex_ = headSize;
 	if (lastIndex_ == bufferSize_ - 1)
 		resizeBuffer();
+*/
+	if (filledIndices_ > gapStart_)
+		lastIndex_ = filledIndices_ + gapSize_;
+	else
+		lastIndex_ = filledIndices_;
 }
 
 void	GapBuffer::recalculateDerivedInfo()
@@ -125,6 +132,7 @@ void	GapBuffer::recalculateDerivedInfo()
 void	GapBuffer::setBuffer(size_t index, char ch)
 {
 	buffer_[index] = ch;
+	lastIndex_++;
 	shrinkGap();
 }
 
@@ -135,6 +143,8 @@ void	GapBuffer::insert(char ch)
 		resizeBuffer();
 		relocateGapTo(gapStart_);
 	}
+	if (gapStart_ >= bufferSize_)
+		resizeBuffer();
 	assert(gapStart_ < bufferSize_);
 	setBuffer(gapStart_, ch);
 }
@@ -238,14 +248,20 @@ std::string	GapBuffer::getVisibleText() const
 		visible.push_back(buffer_[i]);
 		count++;
 	}
-	for (size_t i = gapEnd_; i < bufferSize_; i++)
+	if (gapStart_ < lastIndex_)
 	{
-		visible.push_back(buffer_[i]);
-		count++;
+		for (size_t i = gapEnd_; i < bufferSize_; i++)
+		{
+			if (buffer_[i] != 0)
+			{
+				visible.push_back(buffer_[i]);
+				count++;
+			}
+		}
 	}
-	std::cout << "Filled Indices: " << filledIndices_ << " & Counted characters: " << count << std::endl;
-	if (count != filledIndices_)
-		throw GapBufferException::what("The number of filled Indices does not match the number of visible characters");
+	std::cout << "Filled Indices: " << filledIndices_ << " & Counted characters: " << count << " Visible Text Size: " << visible.size() << std::endl;
+//	if (count != filledIndices_)
+//		throw GapBufferException("The number of filled Indices does not match the number of visible characters");
 	return (visible);
 }
 
@@ -256,5 +272,13 @@ void	GapBuffer::setCursorPosition(size_t index)
 	else if (index > filledIndices_ + gapSize_)
 		relocateGapTo(filledIndices_ + gapSize_ + 1);
 	else if (index >= gapStart_)
-		//TODO figure out how far past the gapEnd_ to put the index
+		relocateGapTo((index - gapStart_) + gapEnd_);
+}
+
+GapBuffer::GapBufferException::GapBufferException(const std::string &what_arg)
+	: what_(what_arg) {}
+
+const char* GapBuffer::GapBufferException::what() const noexcept
+{
+	return (what_.c_str());
 }

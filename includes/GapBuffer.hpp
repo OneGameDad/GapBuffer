@@ -5,12 +5,13 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <stdexcept>
 #include <string>
 #include <iostream>
 #include <filesystem>
 
-#define STARTING_BUFFER_SIZE	1024
-#define STARTING_GAP_SIZE	64
+#define STARTING_BUFFER_SIZE	10
+#define STARTING_GAP_SIZE	6
 
 class GapBuffer
 {
@@ -51,7 +52,6 @@ public:
 
 	//Getters
 	std::string	getVisibleText() const;
-	size_t		getGapSize() const;
 
 	//Writing
 	void	insert(char ch);
@@ -64,8 +64,9 @@ public:
 	class GapBufferException: public std::exception
 	{
 	private:
-
+		std::string what_;
 	public:
-		virtual const char* what() const noexcept;
+		explicit GapBufferException(const std::string &what_arg);
+		virtual const char* what() const noexcept override;
 	};
 };
