@@ -19,7 +19,6 @@ private:
 	char*	buffer_;
 	size_t	bufferSize_;
 	size_t	gapStart_;
-	size_t	gapSize_;
 	size_t	gapEnd_;
 	size_t	filledIndices_;
 	size_t	lastIndex_;
@@ -30,10 +29,11 @@ private:
 	void	setBuffer(size_t index, char ch);
 	void	recalculateDerivedInfo();
 	bool	isTailEmpty();
+	void	zeroOutBuffer(char * buffer, size_t size);
 
 	//Gap
-	void	calculateGapEnd();
-	void	calculateGapSize();
+	size_t	setGapEnd(size_t newSize);
+	size_t	getGapSize();
 	void	calculateFilledIndices();
 	void	calculateLastIndex();
 	void	relocateGapTo(size_t index);

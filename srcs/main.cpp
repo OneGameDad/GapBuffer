@@ -17,11 +17,16 @@ int main()
 	std::string sample = "It was the best of times, it was the wurst of times! It was Schnitzel Time!";
 	std::cout << "The sample string is:\n" << sample << std::endl;
 	std::cout << "Sample size: " << sample.size() << std::endl;
+	std::cout << std::endl;
+	std::cout << std::endl;
+	std::cout << std::endl;
 	// Test 1 Single insert and print
 	try {
 		GapBuffer array1;
 		array1.insert('A');
 		std::cout << array1.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -34,6 +39,8 @@ int main()
 		for (size_t i = 0; i < test.size(); i++)
 			array2.insert(test[i]);
 		std::cout << array2.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -48,6 +55,8 @@ int main()
 		std::cout << array3.getVisibleText() << std::endl;
 		array3.remove();
 		std::cout << array3.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -66,6 +75,8 @@ int main()
 		array4.remove();
 		array4.remove();
 		std::cout << array4.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -84,6 +95,8 @@ int main()
 		for (size_t j = 0; j < other.size(); j++)
 			array5.insert(other[j]);
 		std::cout << array5.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -104,6 +117,8 @@ int main()
 		array6.remove();
 		array6.remove();
 		std::cout << array6.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
