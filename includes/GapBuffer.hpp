@@ -28,7 +28,7 @@ private:
 	void	resizeBuffer();
 	void	setBuffer(size_t index, char ch);
 	void	recalculateDerivedInfo();
-	bool	isTailEmpty();
+	size_t	getTailSize();
 	void	zeroOutBuffer(char * buffer, size_t size);
 
 	//Gap

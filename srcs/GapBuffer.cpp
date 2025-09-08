@@ -50,28 +50,40 @@ bool	GapBuffer::isBufferFull()
 	return (getGapSize() == 0);
 }
 
-void	GapBuffer::resizeBuffer()
+void	GapBuffer::resizeBuffer()//TODO Buffer is copying over 1 less character
 {
 	std::cout << "RESIZE BUFFER CALLED" << std::endl;
-	size_t used = gapStart_ + (bufferSize_ - (gapEnd_ + 1));
-	size_t newBufferSize = (bufferSize_ == STARTING_BUFFER_SIZE) ? STARTING_BUFFER_SIZE : bufferSize_ * 2;
-	while (newBufferSize <= used)
-		newBufferSize *= 2;
-	size_t newGapSize = newBufferSize - used;
-
+	size_t newBufferSize = bufferSize_ * 2;
+	size_t gapSize = getGapSize();
+	size_t newGapEnd = gapStart_ + gapSize - 1;
 	char* newBuffer = new char[newBufferSize];
 	zeroOutBuffer(newBuffer, newBufferSize);
-	std::copy(buffer_, buffer_ + gapStart_, newBuffer),
-	std::copy(buffer_ + gapEnd_ + 1, buffer_ + bufferSize_, newBuffer + gapStart_ + newGapSize);
-	std::fill(newBuffer + gapStart_, newBuffer + gapStart_ + newGapSize, 0);
-	
+
+	std::cout << "Buffer before reset contains: " << getVisibleText() << std::endl;
+	//Copy Head
+	std::copy(buffer_, buffer_ + gapStart_, newBuffer);
+	//Set Gap to Zeros
+	for (size_t i = gapStart_; i < gapEnd_ - 1; i++)
+		newBuffer[i] = 0;
+	//Copy Tail
+	std::copy(buffer_ + gapEnd_, buffer_ + bufferSize_, newBuffer + newGapEnd);
+
+	std::cout << "New Buffer contains: " << std::endl;
+	for (size_t i = 0; i < newBufferSize; i++)
+	{
+		if (newBuffer[i] != 0)
+			std::cout << newBuffer[i];
+	}
+	std::cout << std::endl;
+	std::cout << "Deleting old buffer\n";
 	delete [] buffer_;
+	std::cout << "Assigning new buffer\n";
 	buffer_ = newBuffer;
+	std::cout << "Assigning new buffer size\n";
 	bufferSize_ = newBufferSize;
-	gapEnd_ = newGapSize;
-	//TODO check gap size and maybe resize
-	calculateFilledIndices();
-	calculateLastIndex();
+	std::cout << "Assigning new gap end\n";
+	gapEnd_ = setGapEnd(gapSize);
+	recalculateDerivedInfo();
 }
 
 void	GapBuffer::zeroOutBuffer(char* buffer, size_t size)
@@ -82,7 +94,7 @@ void	GapBuffer::zeroOutBuffer(char* buffer, size_t size)
 
 size_t	GapBuffer::setGapEnd(size_t newSize)
 {
-	gapEnd_ = gapStart_ + newSize - 1;
+	return (gapStart_ + newSize - 1);
 }
 
 size_t	GapBuffer::getGapSize()
@@ -92,6 +104,7 @@ size_t	GapBuffer::getGapSize()
 
 void	GapBuffer::calculateFilledIndices()
 {
+	std::cout << "Calculating Filled Indices\n";
 	size_t count = 0;
 	for (size_t i = 0; i < bufferSize_; i++)
 	{
@@ -116,6 +129,7 @@ void	GapBuffer::calculateFilledIndices()
 
 void	GapBuffer::calculateLastIndex()
 {
+	std::cout << "Calculating Last Index\n";
 /*	size_t headSize = 0;
 	if (gapStart_ != 0)
 		headSize = gapStart_;
@@ -132,7 +146,7 @@ void	GapBuffer::calculateLastIndex()
 	if (lastIndex_ == bufferSize_ - 1)
 		resizeBuffer();
 */
-	if (filledIndices_ > gapStart_)
+	if (filledIndices_ >= gapStart_)
 		lastIndex_ = filledIndices_ + getGapSize();
 	else
 		lastIndex_ = filledIndices_;
@@ -140,6 +154,7 @@ void	GapBuffer::calculateLastIndex()
 
 void	GapBuffer::recalculateDerivedInfo()
 {
+	std::cout << "Recalculating Derived Info\n";
 	calculateFilledIndices();
 	calculateLastIndex();
 }
@@ -147,7 +162,7 @@ void	GapBuffer::recalculateDerivedInfo()
 void	GapBuffer::setBuffer(size_t index, char ch)
 {
 	buffer_[index] = ch;
-//	std::cout << "setBuffer called, Current Last Index: " << lastIndex_ << " Filled Indices: " << filledIndices_ << " Buffer Size: " << bufferSize_ << " Gap Size: " << gapSize_ << std::endl;
+	std::cout << "setBuffer called, Current Last Index: " << lastIndex_ << " Filled Indices: " << filledIndices_ << " Buffer Size: " << bufferSize_ << " Gap Size: " << getGapSize() << " Char: " << ch << std::endl;
 	lastIndex_++;
 	shrinkGap();
 //	std::cout << "New Last Index: " << lastIndex_ << " Filled Indices: " << filledIndices_ << " Buffer Size: " << bufferSize_ << " Gap Size: " << gapSize_ << std::endl;
@@ -155,19 +170,21 @@ void	GapBuffer::setBuffer(size_t index, char ch)
 
 void	GapBuffer::insert(char ch)
 {
-	if (getGapSize() == 0)
+	std::cout << "Inserting Char: " << ch << std::endl;
+/*	if (getGapSize() == 0)
 	{
 		resizeBuffer();
 		relocateGapTo(gapStart_);
 	}
 	if (gapStart_ >= bufferSize_)
 		resizeBuffer();
-	assert(gapStart_ < bufferSize_);
+*/	assert(gapStart_ < bufferSize_);
 	setBuffer(gapStart_, ch);
 }
 
 void	GapBuffer::remove()
 {
+	std::cout << "Removing Chararcter" << std::endl;
 	if (gapStart_ == 0 || filledIndices_ == 0)
 		return ;
 	growGap();
@@ -175,7 +192,6 @@ void	GapBuffer::remove()
 
 void GapBuffer::relocateGapTo(size_t index)
 {
-	//TODO when moving the gapSize_ needs to be restored to a minimum size
 	size_t gapSize = getGapSize();
 	if (index == gapStart_)
 		return ;
@@ -204,49 +220,50 @@ void GapBuffer::relocateGapTo(size_t index)
 	cleanGap();
 }
 
-bool	GapBuffer::isTailEmpty()
+size_t	GapBuffer::getTailSize()
 {
+	size_t tailSize;
 	for (size_t i = gapEnd_; i < bufferSize_; i++)
 	{
 		if (buffer_[i] != 0)
-			return (false);
+			tailSize++;
 	}
-	return (true);
+	return (tailSize);
 }
 
 void	GapBuffer::resizeGap()
 {
 	std::cout << "RESIZE GAP CALLED! Gap Size: " << getGapSize() << std::endl;
 	size_t newGapSize = STARTING_GAP_SIZE;
-	if (gapStart_ + newGapSize >= bufferSize_)
-	{
+	size_t tailSize = getTailSize();
+	if (tailSize != 0 && (gapStart_ + newGapSize + tailSize >= bufferSize_ - 1))
 		resizeBuffer();
-		return ;
-	}
-	else if (!isTailEmpty())
-	{
-		size_t tailSize = bufferSize_ - gapEnd_;
-		memmove(&buffer_[gapEnd_ + newGapSize], &buffer_[gapEnd_], tailSize);
-		gapEnd_ += newGapSize;
-		cleanGap();
-	}
+	memmove(&buffer_[gapEnd_ + newGapSize], &buffer_[gapEnd_], tailSize);
+	gapEnd_ += newGapSize - 1;
+	cleanGap();
+
 }
 
 void	GapBuffer::shrinkGap()
 {
+	std::cout << "Shrinking Gap\n";
 	gapStart_++;
 	recalculateDerivedInfo();
+	if (getGapSize() == 0)
+		resizeGap();
 }
 
 void	GapBuffer::growGap()
 {
+	std::cout << "Growing Gap\n";
 	gapStart_--;
 	recalculateDerivedInfo();
-	cleanGap();
+	buffer_[gapStart_ + 1] = 0;
 }
 
 void	GapBuffer::cleanGap()
 {
+	std::cout << "Filling Gap with Zeros" << std::endl;
 	std::fill(buffer_ + gapStart_, buffer_ + gapEnd_ - 1, 0);
 }
 
