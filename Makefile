@@ -30,14 +30,12 @@ ifeq ($(OS),Windows_NT)
 	NAME := gap_buffer.exe
 	PLATFORM = WINDOWS
 	CXX = g++
-	CXXFLAGS = -Wall -Werror -Wextra -std=c++20 $(DEPFLAGS) #-Ilib/raylib/src
-	LDFLAGS = -lraylib -lfreetype -lopengl32 -lgdi32 -lwinmm #-Llib/raylib/src
+	CXXFLAGS = -Wall -Werror -Wextra -std=c++20 $(DEPFLAGS)
 else ifeq ($(UNAME_S),Linux)
 	NAME := gap_buffer
 	PLATFORM = LINUX
 	CXX = g++
-	CXXFLAGS := -Wall -Wextra -Werror -std=c++20 $(DEPFLAGS) -I/usr/include/freetype2 #-Ilib/raylib/src
-	LDFLAGS = -lraylib -lfreetype -lfmt -lGL -lm -ldl -lpthread -lrt -lX11 #-Llib/raylib/src
+	CXXFLAGS := -Wall -Wextra -Werror -std=c++20 $(DEPFLAGS)
 endif
 
 SRCS_DIR := srcs/
@@ -49,10 +47,6 @@ SRCS := $(addprefix $(SRCS_DIR), $(SRCS_FILES))
 OBJS := $(addprefix $(OBJS_DIR), $(SRCS_FILES:.cpp=.o))
 DEPS := $(OBJS:.o=.d)
 
-#RAYLIB_DIR = lib/raylib
-#RAYLIB_REPO = https://github.com/raysan5/raylib.git
-#RAYLIB_LIB = $(RAYLIB_DIR)/src/libraylib.a
-
 DEPFLAGS := -MMD -MP
 SANITIZERS := -fsanitize=address -fsanitize=leak -fsanitize=undefined
 INCL := -I $(INCL_DIR)
@@ -62,14 +56,6 @@ INCL := -I $(INCL_DIR)
 # Main target
 all: $(NAME) #raylib
 	@echo "$(GREEN)Run the program with ./$(NAME) $(X)"
-
-#raylib:
-#	@if [ ! -d "$(RAYLIB_DIR)" ]; then \
-#		echo "$(DARK_CYAN)Cloning raylib..."; \
-#		git clone --depth=1 $(RAYLIB_REPO) $(RAYLIB_DIR); \
-#		echo "$(DARK_CYAN)Raylib cloned $(X)"; \
-#	fi
-#	@$(MAKE) -C $(RAYLIB_DIR)/src RAYLIB_LIBTYPE=STATIC=$(PLATFORM)
 
 # Linking
 $(NAME): $(OBJS)
@@ -88,16 +74,13 @@ $(OBJS_DIR)%.o: $(SRCS_DIR)%.cpp
 
 # Clean object and dep files
 clean:
-#	$(MAKE) -C $(RAYLIB_DIR)/src clean
-#	echo "$(DARK_RED)Raylib cleaned $(X)";
-
 	@if [ -d "$(OBJS_DIR)" ]; then \
 	$(RM) $(OBJS_DIR); \
 	echo "$(DARK_RED)Objects cleaned $(X)"; \
 	else \
 	echo "No object files to clean"; \
 	fi
-	
+
 	@if [ -d "$(DEPS_DIR)" ]; then \
 	$(RM) $(DEPS_DIR); \
 	echo "$(DARK_RED)Dependencies cleaned $(X)"; else \
@@ -112,13 +95,6 @@ fclean: clean
 	else \
 	echo "No executables to clean"; \
 	fi
-	
-#	@if [ -d "$(RAYLIB_DIR)" ]; then \
-#		$(RM) $(RAYLIB_DIR); \
-#		echo "$(DARK_RED)Raylib directory removed $(X)"; \
-#	else \
-#		echo "Raylib directory not found"; \
-#	fi
 
 # Rebuild
 re: fclean all
@@ -132,4 +108,4 @@ debug: re
 rebug:
 	@$(MAKE) clean
 	@$(MAKE) debug
-	
+

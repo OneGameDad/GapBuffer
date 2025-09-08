@@ -11,7 +11,7 @@
 #include <filesystem>
 
 #define STARTING_BUFFER_SIZE	10
-#define STARTING_GAP_SIZE	6
+#define GAP_SIZE	6
 
 class GapBuffer
 {
@@ -19,23 +19,23 @@ private:
 	char*	buffer_;
 	size_t	bufferSize_;
 	size_t	gapStart_;
-	size_t	gapEnd_;
-	size_t	filledIndices_;
-	size_t	lastIndex_;
+	size_t	tailStart_;
+	size_t	arrayLength_;
+	size_t	arrayLastIndex_;
 
 	//Buffer
 	bool	isBufferFull();
 	void	resizeBuffer();
 	void	setBuffer(size_t index, char ch);
 	void	recalculateDerivedInfo();
-	size_t	getTailSize();
 	void	zeroOutBuffer(char * buffer, size_t size);
 
 	//Gap
-	size_t	setGapEnd(size_t newSize);
+	size_t	setTailStart(size_t newSize);
 	size_t	getGapSize();
-	void	calculateFilledIndices();
-	void	calculateLastIndex();
+	size_t	getTailSize();
+	void	calculateArrayLength();
+	void	calculateArrayLastIndex();
 	void	relocateGapTo(size_t index);
 	void	resizeGap();
 	void	shrinkGap();
