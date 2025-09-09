@@ -138,19 +138,19 @@ void	GapBuffer::remove()
 
 void GapBuffer::relocateGapTo(size_t index)
 {
-	std::cout << "String before Relocation:" << std::endl;
-	std::cout << getVisibleText() << std::endl;
+//	std::cout << "String before Relocation:" << std::endl;
+//	std::cout << getVisibleText() << std::endl;
 	size_t gapSize = getGapSize();
 	if (index == gapStart_)
 		return ;
 	if (index < gapStart_)
 	{
-		calculateArrayLastIndex();
-		if (index > arrayLastIndex_ && arrayLastIndex_ < gapStart_)
-			index = arrayLastIndex_ + 1;
+	//	calculateArrayLastIndex();
+	//	if (index > arrayLastIndex_ && arrayLastIndex_ < gapStart_)
+	//		index = arrayLastIndex_ + 1;
 		std::copy_backward(buffer_ + index,
 		     buffer_ + gapStart_,
-		     buffer_ + gapStart_ + gapSize - 1);
+		     buffer_ + gapStart_ + gapSize);
 		gapStart_ = index;
 		tailStart_ = setTailStart(gapSize);
 	}
@@ -160,16 +160,16 @@ void GapBuffer::relocateGapTo(size_t index)
 		if (index > arrayLastIndex_)
 			index = arrayLastIndex_ + 1;
 		else
-			index = index + getGapSize();
-		std::copy(buffer_ + tailStart_ + 1,
-			buffer_ + tailStart_ + 1 + (index - gapStart_),
+			index = index - gapStart_ + gapSize;
+		std::copy(buffer_ + tailStart_/* + 1*/,
+			buffer_ + tailStart_ /*+ 1 */+ (index/* - gapStart_*/),
 			buffer_ + gapStart_);
 		gapStart_ = index;
 		tailStart_ = setTailStart(gapSize);
 	}
 	cleanGap();
-	std::cout << "String after Relocation:" << std::endl;
-	std::cout << getVisibleText() << std::endl;
+//	std::cout << "String after Relocation:" << std::endl;
+//	std::cout << getVisibleText() << std::endl;
 }
 
 size_t	GapBuffer::getTailSize()
@@ -245,10 +245,11 @@ std::string	GapBuffer::getVisibleText() const
 void	GapBuffer::setCursorPosition(size_t index)
 {
 	size_t gapSize = getGapSize();
+	recalculateDerivedInfo();
 	if (index < gapStart_)
 		relocateGapTo(index);
 	else if (index > arrayLength_ + gapSize)
-		relocateGapTo(arrayLength_ + gapSize + 1);
+		relocateGapTo(arrayLastIndex_);
 	else if (index >= gapStart_)
 		relocateGapTo((index - gapStart_) + tailStart_);
 }
