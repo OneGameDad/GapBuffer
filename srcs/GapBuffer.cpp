@@ -136,35 +136,62 @@ void	GapBuffer::remove()
 	growGap();
 }
 
-void GapBuffer::relocateGapTo(size_t index)
+void GapBuffer::moveBytesToLowerIndices(size_t newIndex)
+{
+	size_t n = gapStart_ - newIndex;
+	size_t newTailStart = tailStart_ - n;
+	size_t end = tailStart_ - 1;
+	char tempArray[n + 1];
+	std::copy(buffer_ + newIndex, buffer_ + gapStart_, tempArray);
+//	for (size_t i = index; i < gapStart_ && i < n + 1; i++)
+//		tempArray[i] = buffer_[i];
+	tempArray[n] = '\0';
+	std::cout << "Temp Array: " << tempArray << std::endl;
+	for (size_t i = end, j = n - 1; i >= end - n && j >= 0; i--, j--)
+			buffer_[i] = tempArray[j];
+	gapStart_ = newIndex;
+	assert(newTailStart == (newIndex + getGapSize() - 1));
+	tailStart_ = newTailStart;
+	cleanGap();
+	std::cout << "Moved Gap: " << std::endl;
+	std::cout << getVisibleText() << std::endl;
+}
+
+void GapBuffer::moveBytesToHigherIndices(size_t newIndex)
+{
+
+}
+
+void GapBuffer::relocateGapTo(size_t newIndex)
 {
 //	std::cout << "String before Relocation:" << std::endl;
 //	std::cout << getVisibleText() << std::endl;
 	size_t gapSize = getGapSize();
-	if (index == gapStart_)
+	if (newIndex == gapStart_)
 		return ;
-	if (index < gapStart_)
+	if (newIndex < gapStart_)
 	{
 	//	calculateArrayLastIndex();
 	//	if (index > arrayLastIndex_ && arrayLastIndex_ < gapStart_)
 	//		index = arrayLastIndex_ + 1;
-		std::copy_backward(buffer_ + index,
-		     buffer_ + gapStart_,
-		     buffer_ + gapStart_ + gapSize);
-		gapStart_ = index;
+		size_t n = gapStart_ - newIndex;
+		std::copy_backward(buffer_ + newIndex,
+		     buffer_ + n,
+		     buffer_ + tailStart_ - 1);
+		gapStart_ = newIndex;
 		tailStart_ = setTailStart(gapSize);
 	}
-	else if (index > gapStart_)
+	else if (newIndex > gapStart_)
 	{
 		calculateArrayLastIndex();
-		if (index > arrayLastIndex_)
-			index = arrayLastIndex_ + 1;
+		if (newIndex > arrayLastIndex_)
+			newIndex = arrayLastIndex_ + 1;
 		else
-			index = index - gapStart_ + gapSize;
+			newIndex = newIndex - gapStart_ + gapSize;
 		std::copy(buffer_ + tailStart_/* + 1*/,
-			buffer_ + tailStart_ /*+ 1 */+ (index/* - gapStart_*/),
+			buffer_ + tailStart_ /*+ 1 */+ (newIndex/* - gapStart_*/),
 			buffer_ + gapStart_);
-		gapStart_ = index;
+		gapStart_ = newIndex;
 		tailStart_ = setTailStart(gapSize);
 	}
 	cleanGap();
@@ -242,16 +269,16 @@ std::string	GapBuffer::getVisibleText() const
 	return (visible);
 }
 
-void	GapBuffer::setCursorPosition(size_t index)
+void	GapBuffer::setCursorPosition(size_t newIndex)
 {
 	size_t gapSize = getGapSize();
 	recalculateDerivedInfo();
-	if (index < gapStart_)
-		relocateGapTo(index);
-	else if (index > arrayLength_ + gapSize)
+	if (newIndex < gapStart_)
+		relocateGapTo(newIndex);
+	else if (newIndex > arrayLength_ + gapSize)
 		relocateGapTo(arrayLastIndex_);
-	else if (index >= gapStart_)
-		relocateGapTo((index - gapStart_) + tailStart_);
+	else if (newIndex >= gapStart_)
+		relocateGapTo((newIndex - gapStart_) + tailStart_);
 }
 
 GapBuffer::GapBufferException::GapBufferException(const std::string &what_arg)

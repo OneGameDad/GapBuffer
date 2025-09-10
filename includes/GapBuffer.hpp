@@ -29,6 +29,8 @@ private:
 	void	setBuffer(size_t index, char ch);
 	void	recalculateDerivedInfo();
 	void	zeroOutBuffer(char * buffer, size_t size);
+	void	moveBytesToLowerIndices(size_t newIndex);
+	void	moveBytesToHigherIndices(size_t newIndex);
 
 	//Gap
 	size_t	setTailStart(size_t newSize);
@@ -36,7 +38,7 @@ private:
 	size_t	getTailSize();
 	void	calculateArrayLength();
 	void	calculateArrayLastIndex();
-	void	relocateGapTo(size_t index);
+	void	relocateGapTo(size_t newIndex);
 	void	resizeGap();
 	void	shrinkGap();
 	void	growGap();
@@ -56,7 +58,7 @@ public:
 	//Writing
 	void	insert(char ch);
 	void	remove();
-	void	setCursorPosition(size_t index);
+	void	setCursorPosition(size_t newIndex);
 
 	//Saving
 	void	saveVisibleText(std::filesystem::path &filename) const;
