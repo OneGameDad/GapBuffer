@@ -87,17 +87,22 @@ int main()
 		GapBuffer array5;
 		std::string other = "Peanut butter jelly time!";
 		std::cout << "Sample Size: " << sample.size() << " Other Size: " << other.size() << std::endl;
-		size_t	index = getRandomIndex(sample.size());
+		size_t	index = 4;//getRandomIndex(sample.size());
 		for (size_t i = 0; i < sample.size(); i++)
 			array5.insert(sample[i]);
 		std::cout << array5.getVisibleText() << std::endl;
 		std::cout << "Other string: " << other << std::endl;
 		array5.setCursorPosition(index);
+		size_t tempIndex = index;
 		for (size_t j = 0; j < other.size(); j++)
+		{
+			//std::cout << array5
 			array5.insert(other[j]);
+			tempIndex++;
+		}
 		std::cout << "String with second string inserted" << std::endl;
 		std::cout << array5.getVisibleText() << std::endl;
-		std::cout << "Final Size: " << array5.getVisibleText().size() << std::endl;
+		std::cout << "Final Size: " << array5.getVisibleText().size() << " Current Index: " << tempIndex << " Gap Size: " << array5.getGapSize() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
 	}
@@ -107,7 +112,7 @@ int main()
 	}
 	std::cout << "Test 6 Multiple inserts and print, followed by moving cursor to a random index, 5 removes and print using sample string" << std::endl;
 	try {
-		GapBuffer array6;	
+		GapBuffer array6;
 		size_t	index = getRandomIndex(sample.size());
 		for (size_t i = 0; i < sample.size(); i++)
 			array6.insert(sample[i]);
@@ -165,10 +170,10 @@ int main()
 		size_t	index = getRandomIndex(sample.size());
 		for (size_t i = 0; i < sample.size(); i++)
 			array8.insert(sample[i]);
-		std::cout << array8.getVisibleText() << std::endl;	
+		std::cout << array8.getVisibleText() << std::endl;
 		array8.setCursorPosition(index);
 		for (size_t i = 0; i < other.size(); i++)
-			array8.insert(other[i]);	
+			array8.insert(other[i]);
 		std::cout << "String with second string inserted" << std::endl;
 		std::cout << array8.getVisibleText() << std::endl;
 		index = getRandomIndex(sample.size());

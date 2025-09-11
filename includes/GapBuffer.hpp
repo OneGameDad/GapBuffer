@@ -34,7 +34,6 @@ private:
 
 	//Gap
 	size_t	setTailStart(size_t newSize);
-	size_t	getGapSize();
 	size_t	getTailSize();
 	void	calculateArrayLength();
 	void	calculateArrayLastIndex();
@@ -55,6 +54,7 @@ public:
 	//Getters
 	std::string	getVisibleText() const;
 
+	size_t	getGapSize();
 	//Writing
 	void	insert(char ch);
 	void	remove();
