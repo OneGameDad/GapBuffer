@@ -31,7 +31,7 @@ private:
 	void	zeroOutBuffer(char * buffer, size_t size);
 	void	moveBytesToLowerIndices(size_t newIndex);
 	void	moveBytesToHigherIndices(size_t newIndex);
-
+	void	shiftTailBytesToHigherIndices(size_t newTailStart, size_t tailDiff);
 	//Gap
 	size_t	setTailStart(size_t newSize);
 	size_t	getTailSize();
