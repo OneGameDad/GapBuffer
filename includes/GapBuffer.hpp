@@ -54,7 +54,8 @@ public:
 	//Getters
 	std::string	getVisibleText() const;
 
-	size_t	getGapSize();
+	size_t	getGapSize() const;
+	size_t	getLastIndex() const;
 	//Writing
 	void	insert(char ch);
 	void	remove();

@@ -94,6 +94,7 @@ int main()
 		std::cout << "Other string: " << other << std::endl;
 		array5.setCursorPosition(index);
 		size_t tempIndex = index;
+		std::cout << "New Index: " << index << " Last Index: " << array5.getLastIndex() << std::endl;
 		for (size_t j = 0; j < other.size(); j++)
 		{
 			//std::cout << array5
@@ -116,7 +117,8 @@ int main()
 		size_t	index = getRandomIndex(sample.size());
 		for (size_t i = 0; i < sample.size(); i++)
 			array6.insert(sample[i]);
-		std::cout << array6.getVisibleText() << std::endl;
+		std::cout << array6.getVisibleText() << std::endl;	
+		std::cout << "New Index: " << index <<  " Last Index: " << array6.getLastIndex() << std::endl;
 		array6.setCursorPosition(index);
 		array6.remove();
 		array6.remove();
@@ -140,7 +142,8 @@ int main()
 		size_t	index = getRandomIndex(sample.size());
 		for (size_t i = 0; i < sample.size(); i++)
 			array7.insert(sample[i]);
-		std::cout << array7.getVisibleText() << std::endl;
+		std::cout << array7.getVisibleText() << std::endl;	
+		std::cout << "New Index: " << index <<  " Last Index: " << array7.getLastIndex() << std::endl;
 		array7.setCursorPosition(index);
 		array7.remove();
 		array7.remove();
@@ -149,7 +152,8 @@ int main()
 		array7.remove();
 		std::cout << "Removing characters:" << std::endl;
 		std::cout << array7.getVisibleText() << std::endl;
-		index = getRandomIndex(sample.size());
+		index = getRandomIndex(sample.size());	
+		std::cout << "New Index: " << index << " Last Index: " << array7.getLastIndex() << std::endl;
 		array7.setCursorPosition(index);
 		for (size_t i = 0; i < other.size(); i++)
 			array7.insert(other[i]);
@@ -170,13 +174,15 @@ int main()
 		size_t	index = getRandomIndex(sample.size());
 		for (size_t i = 0; i < sample.size(); i++)
 			array8.insert(sample[i]);
-		std::cout << array8.getVisibleText() << std::endl;
+		std::cout << array8.getVisibleText() << std::endl;	
+		std::cout << "New Index: " << index << " Last Index: " << array8.getLastIndex() << std::endl;
 		array8.setCursorPosition(index);
 		for (size_t i = 0; i < other.size(); i++)
 			array8.insert(other[i]);
 		std::cout << "String with second string inserted" << std::endl;
 		std::cout << array8.getVisibleText() << std::endl;
-		index = getRandomIndex(sample.size());
+		index = getRandomIndex(sample.size());	
+		std::cout << "New Index: " << index << " Last Index: " << array8.getLastIndex() << std::endl;
 		array8.setCursorPosition(index);
 		array8.remove();
 		array8.remove();
@@ -200,7 +206,8 @@ int main()
 		for (size_t i = 0; i < sample.size(); i++)
 			array9.insert(sample[i]);
 		std::cout << array9.getVisibleText() << std::endl;
-		size_t	index = getRandomIndex(sample.size());
+		size_t	index = sample.size() + 1;
+		std::cout << "New Index: " << index << " Last Index: " << array9.getLastIndex() << std::endl;
 		array9.setCursorPosition(index);
 		array9.setCursorPosition(array9.getVisibleText().size() + 5);
 		for (size_t i = 0; i < other.size(); i++)
