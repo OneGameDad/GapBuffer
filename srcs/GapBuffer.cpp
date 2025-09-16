@@ -1,4 +1,6 @@
 #include "../includes/GapBuffer.hpp"
+#include <cstddef>
+#include <utility>
 
 GapBuffer::GapBuffer()
 	: bufferSize_(STARTING_BUFFER_SIZE), gapStart_(0), arrayLength_(0), arrayLastIndex_(0)
@@ -163,7 +165,10 @@ void GapBuffer::moveBytesToHigherIndices(size_t newIndex)
 {
 	size_t bytesToMove = gapStart_ - newIndex;
 	size_t newTailStart = tailStart_ - bytesToMove;
-	size_t assumedNewTail = newIndex + getGapSize();
+	size_t gapSize = getGapSize();
+	if (gapSize > GAP_SIZE)
+		gapSize = GAP_SIZE;
+	size_t assumedNewTail = newIndex + gapSize;
 	assert(newTailStart == assumedNewTail);
 	char tempArray[bytesToMove + 1];
 	for (size_t i = newIndex, j = 0; i < gapStart_ && j < bytesToMove + 1; i++, j++)
@@ -183,6 +188,8 @@ void GapBuffer::moveBytesToHigherIndices(size_t newIndex)
 void GapBuffer::moveBytesToLowerIndices(size_t newIndex)
 {
 	size_t gapSize = getGapSize();
+	if (gapSize > GAP_SIZE)
+		gapSize = GAP_SIZE;
 	calculateArrayLastIndex();
 	if (newIndex > arrayLastIndex_)
 		newIndex = arrayLastIndex_;
@@ -321,8 +328,25 @@ const char* GapBuffer::GapBufferException::what() const noexcept
 	return (what_.c_str());
 }
 
-void	GapBuffer::saveVisibleText(std::filesystem::path &filename) const
+void	GapBuffer::setContent(std::string newContent)
 {
-	std::string temp = getVisibleText();
+ //TODO
+}
 
+void	GapBuffer::deleteSelection(size_t start, size_t end)
+{
+	if (start == end)
+		return ;
+	if (start > end)
+		std::swap(start, end);
+	setCursorPosition(end);
+	for (size_t i = end; i >= start; i--)
+		remove();
+}
+
+void	GapBuffer::paste(std::string newContent, size_t cursorPosition)
+{
+	setCursorPosition(cursorPosition);
+	for (size_t i = 0; i < newContent.size(); i++)
+		insert(newContent[i]);
 }

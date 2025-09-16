@@ -66,9 +66,9 @@ public:
 	void	insert(char ch);
 	void	remove();
 	void	setCursorPosition(size_t newIndex);
-
-	//Saving
-	void	saveVisibleText(std::filesystem::path &filename) const;
+	void	setContent(std::string newContent);
+	void	deleteSelection(size_t start, size_t end);
+	void	paste(std::string newContent, size_t cursorPosition);
 
 	class GapBufferException: public std::exception
 	{
