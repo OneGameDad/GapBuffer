@@ -323,5 +323,6 @@ const char* GapBuffer::GapBufferException::what() const noexcept
 
 void	GapBuffer::saveVisibleText(std::filesystem::path &filename) const
 {
-	
+	std::string temp = getVisibleText();
+
 }

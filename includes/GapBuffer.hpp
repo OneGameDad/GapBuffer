@@ -12,8 +12,8 @@
 #include <cstring>
 #include <utility>
 
-#define STARTING_BUFFER_SIZE	10
-#define GAP_SIZE	6
+#define STARTING_BUFFER_SIZE	1024
+#define GAP_SIZE	64
 
 class GapBuffer
 {
