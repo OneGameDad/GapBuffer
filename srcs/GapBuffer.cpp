@@ -1,10 +1,4 @@
 #include "../includes/GapBuffer.hpp"
-#include <algorithm>
-#include <cstddef>
-#include <cstring>
-#include <iostream>
-#include <stdexcept>
-#include <utility>
 
 GapBuffer::GapBuffer()
 	: bufferSize_(STARTING_BUFFER_SIZE), gapStart_(0), arrayLength_(0), arrayLastIndex_(0)
@@ -105,15 +99,17 @@ size_t	GapBuffer::setTailStart(size_t newSize)
 	return (gapStart_ + newSize - 1);
 }
 
-size_t	GapBuffer::getGapSize() const
-{
-	return (tailStart_ - gapStart_);
-}
+size_t	GapBuffer::getGapSize() const { return (tailStart_ - gapStart_); }
 
-size_t	GapBuffer::getLastIndex() const
-{
-	return (arrayLastIndex_);
-}
+size_t	GapBuffer::getLastIndex() const { return (arrayLastIndex_); }
+
+size_t	GapBuffer::getTailStart() const { return (tailStart_); }
+
+size_t	GapBuffer::getArrayLength() const { return (arrayLength_); }
+
+size_t	GapBuffer::getGapStart() const { return (gapStart_); }
+
+size_t	GapBuffer::getBufferSize() const { return (bufferSize_); }
 
 void	GapBuffer::calculateArrayLength()
 {
@@ -165,43 +161,40 @@ void	GapBuffer::remove()
 
 void GapBuffer::moveBytesToHigherIndices(size_t newIndex)
 {
-	size_t n = gapStart_ - newIndex;
-	size_t newTailStart = tailStart_ - n;
+	size_t bytesToMove = gapStart_ - newIndex;
+	size_t newTailStart = tailStart_ - bytesToMove;
 	size_t assumedNewTail = newIndex + getGapSize();
 	assert(newTailStart == assumedNewTail);
-	char tempArray[n];
-	for (size_t i = newIndex, j = 0; i < gapStart_ && j < n + 1; i++, j++)
+	char tempArray[bytesToMove + 1];
+	for (size_t i = newIndex, j = 0; i < gapStart_ && j < bytesToMove + 1; i++, j++)
 	{
 		tempArray[j] = buffer_[i];
 		buffer_[i] = '\0';
 	}
-	tempArray[n] = '\0';
-	for (size_t i = newTailStart, j = 0; j < n; i++, j++)
+	tempArray[bytesToMove] = '\0';
+	for (size_t i = newTailStart, j = 0; j < bytesToMove; i++, j++)
 			buffer_[i] = tempArray[j];
 	gapStart_ = newIndex;
 	tailStart_ = newTailStart;
 	cleanGap();
 	recalculateDerivedInfo();
-//	std::cout << "Buffer pre-2nd string insert: " << getVisibleText() << std::endl;
-//	std::cout << "Gap Size: " << getGapSize() << std::endl;
 }
+
 void GapBuffer::moveBytesToLowerIndices(size_t newIndex)
 {
 	size_t gapSize = getGapSize();
 	calculateArrayLastIndex();
 	if (newIndex > arrayLastIndex_)
-	{
-		newIndex = arrayLastIndex_ + 1;
-		gapSize = bufferSize_ - arrayLastIndex_;
-	}
+		newIndex = arrayLastIndex_;
 	else
-		newIndex = newIndex - gapStart_ + gapSize;	
-//	std::cout << "Moving Bytes to Lower Index: " << newIndex << std::endl;
-	size_t bytesToMove = newIndex - tailStart_;
-//	size_t newTailStart = newIndex + gapSize;
-//	std::cout << "Tail Start: " << tailStart_ << " New Tail Start: " << newTailStart << " Gap Size: " << gapSize << " Bytes To Move: " << bytesToMove << std::endl;
-	assert((tailStart_ + gapSize) > (gapStart_ + bytesToMove));
-	char tempArray[bytesToMove];
+		newIndex = newIndex - gapStart_ + gapSize;		
+	size_t bytesToMove;
+	if (newIndex > tailStart_)
+		bytesToMove = newIndex - tailStart_;
+	else
+		bytesToMove = tailStart_ - newIndex;
+	std::cout << "Temp Array Size: " << bytesToMove + 1 << std::endl;
+	char tempArray[bytesToMove + 1];
 	for (size_t i = tailStart_, j = 0; i < newIndex; i++, j++)
 	{
 		tempArray[j] = buffer_[i];
@@ -262,7 +255,6 @@ void	GapBuffer::resizeGap()
 		return ;
 	}
 		shiftTailBytesToHigherIndices(newGapSize, tailSize);
-//	std::cout << "Resize Gap Buffer string check: " << getVisibleText() << std::endl;
 }
 
 void	GapBuffer::shrinkGap()
@@ -296,28 +288,14 @@ std::string	GapBuffer::getVisibleText() const
 	size_t count = 0;
 	for(size_t i = 0; i < bufferSize_; i++)
 	{
-		//if (buffer_[i] != 0)
-		//{
-			if (buffer_[i] == ' ')//TODO remove
-			{
-				visible.push_back('_');
-				count++;
-			}
-/*			else if (buffer_[i] == 0)
-			{
-				visible.push_back('#');
-				count++;
-			}
-*/			else
-			{
-				visible.push_back(buffer_[i]);
-				count++;
-			}
-		//}
+		if (buffer_[i] != 0)
+		{
+			visible.push_back(buffer_[i]);
+			count++;
+		}
 	}
-//	std::cout << "Array Length: " << arrayLength_ << " & Counted characters: " << count << " Visible Text Size: " << visible.size() << std::endl;
-//	if (count != arrayLength_)
-//		throw GapBufferException("The number of filled Indices does not match the number of visible characters");
+	if (count != arrayLength_)
+		throw GapBufferException("The number of filled Indices does not match the number of visible characters");
 	return (visible);
 }
 
@@ -330,11 +308,7 @@ void	GapBuffer::setCursorPosition(size_t newIndex)
 	else if (newIndex < gapStart_)
 		relocateGapTo(newIndex);
 	else if (newIndex > arrayLength_ + gapSize)
-	{
-		std::cout << "Last Index: " << arrayLastIndex_ << " New Index: " << newIndex << std::endl;
-		
-		relocateGapTo(arrayLastIndex_);
-	}
+		relocateGapTo(arrayLastIndex_ + 1);
 	else if (newIndex > gapStart_)
 		relocateGapTo((newIndex - gapStart_) + tailStart_);
 }
@@ -345,4 +319,9 @@ GapBuffer::GapBufferException::GapBufferException(const std::string &what_arg)
 const char* GapBuffer::GapBufferException::what() const noexcept
 {
 	return (what_.c_str());
+}
+
+void	GapBuffer::saveVisibleText(std::filesystem::path &filename) const
+{
+	
 }

@@ -9,6 +9,8 @@
 #include <string>
 #include <iostream>
 #include <filesystem>
+#include <cstring>
+#include <utility>
 
 #define STARTING_BUFFER_SIZE	10
 #define GAP_SIZE	6
@@ -53,9 +55,13 @@ public:
 
 	//Getters
 	std::string	getVisibleText() const;
-
 	size_t	getGapSize() const;
 	size_t	getLastIndex() const;
+	size_t	getTailStart() const;
+	size_t	getArrayLength() const;
+	size_t	getGapStart() const;
+	size_t	getBufferSize() const;
+
 	//Writing
 	void	insert(char ch);
 	void	remove();
