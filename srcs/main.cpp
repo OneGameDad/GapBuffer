@@ -117,7 +117,7 @@ int main()
 		size_t	index = getRandomIndex(sample.size());
 		for (size_t i = 0; i < sample.size(); i++)
 			array6.insert(sample[i]);
-		std::cout << array6.getVisibleText() << std::endl;	
+		std::cout << array6.getVisibleText() << std::endl;
 		std::cout << "New Index: " << index <<  " Last Index: " << array6.getLastIndex() << std::endl;
 		array6.setCursorPosition(index);
 		array6.remove();
@@ -143,7 +143,7 @@ int main()
 		for (size_t i = 0; i < sample.size(); i++)
 			array7.insert(sample[i]);
 		std::cout << array7.getVisibleText() << std::endl;
-		std::cout << "Current Index: " << array7.getGapStart() << " New Index: " << index << " Gap size: " << array7.getGapSize() << " Tail Start:" << array7.getTailStart() << " Last Index: " << array7.getLastIndex() << " Array Length: " << array7.getArrayLength() << " Buffer Length: " << array7.getBufferSize() << std::endl;	
+		std::cout << "Current Index: " << array7.getGapStart() << " New Index: " << index << " Gap size: " << array7.getGapSize() << " Tail Start:" << array7.getTailStart() << " Last Index: " << array7.getLastIndex() << " Array Length: " << array7.getArrayLength() << " Buffer Length: " << array7.getBufferSize() << std::endl;
 		array7.setCursorPosition(index);
 		array7.remove();
 		array7.remove();
@@ -152,7 +152,7 @@ int main()
 		array7.remove();
 		std::cout << "Removing characters:" << std::endl;
 		std::cout << array7.getVisibleText() << std::endl;
-		index = getRandomIndex(sample.size());	
+		index = getRandomIndex(sample.size());
 		std::cout << "Current Index: " << array7.getGapStart() << " New Index: " << index << " Gap size: " << array7.getGapSize() << " Tail Start:" << array7.getTailStart() << " Last Index: " << array7.getLastIndex() << " Array Length: " << array7.getArrayLength() << " Buffer Size: " << array7.getBufferSize() << std::endl;
 		array7.setCursorPosition(index);
 		for (size_t i = 0; i < other.size(); i++)
@@ -206,13 +206,85 @@ int main()
 		for (size_t i = 0; i < sample.size(); i++)
 			array9.insert(sample[i]);
 		std::cout << array9.getVisibleText() << std::endl;
-		size_t	index = sample.size() + 1;
+		size_t	index = array9.getVisibleText().size() + 5;
 		std::cout << "Current Index: " << array9.getGapStart() << " New Index: " << index << " Gap size: " << array9.getGapSize() << " Tail Start:" << array9.getTailStart() << " Last Index: " << array9.getLastIndex() << " Array Length: " << array9.getArrayLength() << " Buffer Size: " << array9.getBufferSize() << std::endl;
 		array9.setCursorPosition(index);
-		array9.setCursorPosition(array9.getVisibleText().size() + 5);
 		for (size_t i = 0; i < other.size(); i++)
 			array9.insert(other[i]);
 		std::cout << array9.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+	}
+	catch (std::exception &e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	std::cout << "Test 10 Multiple inserts and print, followed by removing 60 characters, and moving the cursor to a lower index" << std::endl;
+	try {
+		GapBuffer array10;
+		std::cout << "Sample Size: " << sample.size() << std::endl;
+		for (size_t i = 0; i < sample.size(); i++)
+			array10.insert(sample[i]);
+		std::cout << array10.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << array10.getGapStart() << " Gap size: " << array10.getGapSize() << " Tail Start:" << array10.getTailStart() << " Last Index: " << array10.getLastIndex() << " Array Length: " << array10.getArrayLength() << " Buffer Size: " << array10.getBufferSize() << std::endl;
+		for (size_t i = 0; i < 60; i++)
+			array10.remove();
+		size_t	index = 5;
+		std::cout << "Current Index: " << array10.getGapStart() << " Gap size: " << array10.getGapSize() << " Tail Start:" << array10.getTailStart() << " Last Index: " << array10.getLastIndex() << " Array Length: " << array10.getArrayLength() << " Buffer Size: " << array10.getBufferSize() << std::endl;
+		array10.setCursorPosition(index);
+		std::cout << array10.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+	}
+	catch (std::exception &e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	std::cout << "Test 11 Multiple inserts and print, followed by removing 60 characters, and moving the cursor to a lower index and inserting a second string" << std::endl;
+	try {
+		GapBuffer array11;
+		std::string other = "Peanut butter jelly time!";
+		std::cout << "Sample Size: " << sample.size() << " Other Size: " << other.size() << std::endl;
+		for (size_t i = 0; i < sample.size(); i++)
+			array11.insert(sample[i]);
+		std::cout << array11.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << array11.getGapStart() << " Gap size: " << array11.getGapSize() << " Tail Start:" << array11.getTailStart() << " Last Index: " << array11.getLastIndex() << " Array Length: " << array11.getArrayLength() << " Buffer Size: " << array11.getBufferSize() << std::endl;
+		for (size_t i = 0; i < 60; i++)
+			array11.remove();
+		size_t	index = 5;
+		std::cout << "Current Index: " << array11.getGapStart() << " Gap size: " << array11.getGapSize() << " Tail Start:" << array11.getTailStart() << " Last Index: " << array11.getLastIndex() << " Array Length: " << array11.getArrayLength() << " Buffer Size: " << array11.getBufferSize() << std::endl;
+		array11.setCursorPosition(index);
+		std::cout << array11.getVisibleText() << std::endl;
+		for (size_t i = 0; i < other.size(); i++)
+			array11.insert(other[i]);
+		std::cout << array11.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << array11.getGapStart() << " Gap size: " << array11.getGapSize() << " Tail Start:" << array11.getTailStart() << " Last Index: " << array11.getLastIndex() << " Array Length: " << array11.getArrayLength() << " Buffer Size: " << array11.getBufferSize() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+	}
+	catch (std::exception &e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+	std::cout << "Test 12 Multiple inserts and print, followed by removing all characters, and moving the cursor to another index and inserting a second string" << std::endl;
+	try {
+		GapBuffer array12;
+		std::string other = "Peanut butter jelly time!";
+		std::cout << "Sample Size: " << sample.size() << " Other Size: " << other.size() << std::endl;
+		for (size_t i = 0; i < sample.size(); i++)
+			array12.insert(sample[i]);
+		std::cout << array12.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << array12.getGapStart() << " Gap size: " << array12.getGapSize() << " Tail Start:" << array12.getTailStart() << " Last Index: " << array12.getLastIndex() << " Array Length: " << array12.getArrayLength() << " Buffer Size: " << array12.getBufferSize() << std::endl;
+		for (ssize_t i = static_cast<ssize_t>(array12.getArrayLength()); i > -1; i--)
+			array12.remove();
+		size_t	index = 5;
+		std::cout << "Current Index: " << array12.getGapStart() << " Gap size: " << array12.getGapSize() << " Tail Start:" << array12.getTailStart() << " Last Index: " << array12.getLastIndex() << " Array Length: " << array12.getArrayLength() << " Buffer Size: " << array12.getBufferSize() << std::endl;
+		array12.setCursorPosition(index);
+		std::cout << array12.getVisibleText() << std::endl;
+		for (size_t i = 0; i < other.size(); i++)
+			array12.insert(other[i]);
+		std::cout << array12.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << array12.getGapStart() << " Gap size: " << array12.getGapSize() << " Tail Start:" << array12.getTailStart() << " Last Index: " << array12.getLastIndex() << " Array Length: " << array12.getArrayLength() << " Buffer Size: " << array12.getBufferSize() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
 	}

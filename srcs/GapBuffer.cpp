@@ -10,6 +10,18 @@ GapBuffer::GapBuffer()
 	tailStart_ = setTailStart(GAP_SIZE);
 }
 
+GapBuffer::GapBuffer(std::string &newContent)
+	: gapStart_(0), arrayLength_(0), arrayLastIndex_(0)
+{
+	size_t size = newContent.size() + 1 + GAP_SIZE;
+	buffer_ = new char[size];
+	zeroOutBuffer(buffer_, size);
+	tailStart_ = setTailStart(GAP_SIZE);
+	for (size_t i = 0; i < newContent.size(); i++)
+		insert(newContent[i]);
+	relocateGapTo(0);
+}
+
 GapBuffer::~GapBuffer()
 {
 	if (buffer_ != nullptr)
@@ -163,13 +175,11 @@ void	GapBuffer::remove()
 
 void GapBuffer::moveBytesToHigherIndices(size_t newIndex)
 {
+	assert(gapStart_ + getGapSize() + getTailSize() < bufferSize_);
+	size_t gapSize = getGapSize();
 	size_t bytesToMove = gapStart_ - newIndex;
 	size_t newTailStart = tailStart_ - bytesToMove;
-	size_t gapSize = getGapSize();
-	if (gapSize > GAP_SIZE)
-		gapSize = GAP_SIZE;
-	size_t assumedNewTail = newIndex + gapSize;
-	assert(newTailStart == assumedNewTail);
+	assert(newTailStart == newIndex + gapSize);
 	char tempArray[bytesToMove + 1];
 	for (size_t i = newIndex, j = 0; i < gapStart_ && j < bytesToMove + 1; i++, j++)
 	{
@@ -187,20 +197,18 @@ void GapBuffer::moveBytesToHigherIndices(size_t newIndex)
 
 void GapBuffer::moveBytesToLowerIndices(size_t newIndex)
 {
+	assert(gapStart_ + getGapSize() + getTailSize() < bufferSize_);
 	size_t gapSize = getGapSize();
-	if (gapSize > GAP_SIZE)
-		gapSize = GAP_SIZE;
 	calculateArrayLastIndex();
 	if (newIndex > arrayLastIndex_)
 		newIndex = arrayLastIndex_;
 	else
-		newIndex = newIndex - gapStart_ + gapSize;		
+		newIndex = newIndex - gapStart_ + gapSize;
 	size_t bytesToMove;
 	if (newIndex > tailStart_)
 		bytesToMove = newIndex - tailStart_;
 	else
 		bytesToMove = tailStart_ - newIndex;
-	std::cout << "Temp Array Size: " << bytesToMove + 1 << std::endl;
 	char tempArray[bytesToMove + 1];
 	for (size_t i = tailStart_, j = 0; i < newIndex; i++, j++)
 	{
@@ -218,6 +226,7 @@ void GapBuffer::moveBytesToLowerIndices(size_t newIndex)
 
 void GapBuffer::shiftTailBytesToHigherIndices(size_t newGapSize, size_t tailSize)
 {
+	assert(gapStart_ + getGapSize() + getTailSize() < bufferSize_);
 	size_t tailDiff = gapStart_ + newGapSize - tailStart_;
 	size_t newTailStart = tailStart_ + tailDiff;
 	assert((gapStart_ + newGapSize + tailSize) < bufferSize_);
@@ -239,7 +248,7 @@ void GapBuffer::shiftTailBytesToHigherIndices(size_t newGapSize, size_t tailSize
 
 void GapBuffer::relocateGapTo(size_t newIndex)
 {
-	if (newIndex == gapStart_)
+	if (newIndex == gapStart_ || (arrayLength_ == 0 && gapStart_ == 0) || (getGapSize() == bufferSize_ - 1))
 		return ;
 	if (newIndex < gapStart_)
 		moveBytesToHigherIndices(newIndex);
@@ -328,11 +337,6 @@ const char* GapBuffer::GapBufferException::what() const noexcept
 	return (what_.c_str());
 }
 
-void	GapBuffer::setContent(std::string newContent)
-{
- //TODO
-}
-
 void	GapBuffer::deleteSelection(size_t start, size_t end)
 {
 	if (start == end)
@@ -344,7 +348,7 @@ void	GapBuffer::deleteSelection(size_t start, size_t end)
 		remove();
 }
 
-void	GapBuffer::paste(std::string newContent, size_t cursorPosition)
+void	GapBuffer::paste(std::string &newContent, size_t cursorPosition)
 {
 	setCursorPosition(cursorPosition);
 	for (size_t i = 0; i < newContent.size(); i++)

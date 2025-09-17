@@ -12,8 +12,8 @@
 #include <cstring>
 #include <utility>
 
-#define STARTING_BUFFER_SIZE	1024
-#define GAP_SIZE	64
+#define STARTING_BUFFER_SIZE	10
+#define GAP_SIZE	6
 
 class GapBuffer
 {
@@ -46,6 +46,7 @@ private:
 	void	cleanGap();
 public:
 	GapBuffer();
+	GapBuffer(std::string &newContent);
 	~GapBuffer();
 	GapBuffer(const GapBuffer &copy);
 	GapBuffer &operator=(const GapBuffer &copy);
@@ -66,9 +67,8 @@ public:
 	void	insert(char ch);
 	void	remove();
 	void	setCursorPosition(size_t newIndex);
-	void	setContent(std::string newContent);
 	void	deleteSelection(size_t start, size_t end);
-	void	paste(std::string newContent, size_t cursorPosition);
+	void	paste(std::string &newContent, size_t cursorPosition);
 
 	class GapBufferException: public std::exception
 	{
