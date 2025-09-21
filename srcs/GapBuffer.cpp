@@ -324,7 +324,7 @@ void	GapBuffer::setCursorPosition(size_t newIndex)
 	else if (newIndex < gapStart_)
 		relocateGapTo(newIndex);
 	else if (newIndex > arrayLength_ + gapSize)
-		relocateGapTo(arrayLastIndex_ + 1);
+		relocateGapTo(arrayLastIndex_);
 	else if (newIndex > gapStart_)
 		relocateGapTo((newIndex - gapStart_) + tailStart_);
 }
