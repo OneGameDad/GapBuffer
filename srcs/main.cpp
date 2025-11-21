@@ -1,4 +1,5 @@
 #include "../includes/GapBuffer.hpp"
+#include "../includes/utf8GapBuffer.hpp"
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -28,6 +29,12 @@ int main()
 		std::cout << array1.getVisibleText() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
+		
+		utf8GapBuffer utf8array1;
+		utf8array1.insert('A');
+		std::cout << utf8array1.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -39,6 +46,13 @@ int main()
 		for (size_t i = 0; i < sample.size(); i++)
 			array2.insert(sample[i]);
 		std::cout << array2.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+
+		utf8GapBuffer utf8array2;
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array2.insert(sample[i]);
+		std::cout << utf8array2.getVisibleText() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
 	}
@@ -55,6 +69,16 @@ int main()
 		std::cout << "Removing character:" <<std::endl;
 		array3.remove();
 		std::cout << array3.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+
+		utf8GapBuffer utf8array3;
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array3.insert(sample[i]);
+		std::cout << utf8array3.getVisibleText() << std::endl;
+		std::cout << "Removing character:" <<std::endl;
+		utf8array3.remove();
+		std::cout << utf8array3.getVisibleText() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
 	}
@@ -75,6 +99,20 @@ int main()
 		array4.remove();
 		array4.remove();
 		std::cout << array4.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+		
+		utf8GapBuffer utf8array4;
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array4.insert(sample[i]);
+		std::cout << utf8array4.getVisibleText() << std::endl;
+		std::cout << "Removing characters:" << std::endl;
+		utf8array4.remove();
+		utf8array4.remove();
+		utf8array4.remove();
+		utf8array4.remove();
+		utf8array4.remove();
+		std::cout << utf8array4.getVisibleText() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
 	}
@@ -106,6 +144,29 @@ int main()
 		std::cout << "Final Size: " << array5.getVisibleText().size() << " Current Index: " << tempIndex << " Gap Size: " << array5.getGapSize() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
+
+		utf8GapBuffer utf8array5;
+		std::string other = "Peanut butter jelly time!";
+		std::cout << "Sample Size: " << sample.size() << " Other Size: " << other.size() << std::endl;
+		size_t	index = 4;//getRandomIndex(sample.size());
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array5.insert(sample[i]);
+		std::cout << utf8array5.getVisibleText() << std::endl;
+		std::cout << "Other string: " << other << std::endl;
+		utf8array5.setCursorPosition(index);
+		size_t tempIndex = index;
+		std::cout << "New Index: " << index << " Last Index: " << utf8array5.getLastIndex() << std::endl;
+		for (size_t j = 0; j < other.size(); j++)
+		{
+			//std::cout << array5
+			utf8array5.insert(other[j]);
+			tempIndex++;
+		}
+		std::cout << "String with second string inserted" << std::endl;
+		std::cout << utf8array5.getVisibleText() << std::endl;
+		std::cout << "Final Size: " << utf8array5.getVisibleText().size() << " Current Index: " << tempIndex << " Gap Size: " << utf8array5.getGapSize() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -127,6 +188,23 @@ int main()
 		array6.remove();
 		std::cout << "Removing characters:" << std::endl;
 		std::cout << array6.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+
+		utf8GapBuffer utf8array6;
+		size_t	index = getRandomIndex(sample.size());
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array6.insert(sample[i]);
+		std::cout << utf8array6.getVisibleText() << std::endl;
+		std::cout << "New Index: " << index <<  " Last Index: " << utf8array6.getLastIndex() << std::endl;
+		utf8array6.setCursorPosition(index);
+		utf8array6.remove();
+		utf8array6.remove();
+		utf8array6.remove();
+		utf8array6.remove();
+		utf8array6.remove();
+		std::cout << "Removing characters:" << std::endl;
+		std::cout << utf8array6.getVisibleText() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
 	}
@@ -161,6 +239,32 @@ int main()
 		std::cout << array7.getVisibleText() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
+
+		utf8GapBuffer utf8array7;
+		std::string other = "Peanut butter jelly time!";
+		std::cout << "Sample Size: " << sample.size() << " Other Size: " << other.size() << std::endl;
+		size_t	index = getRandomIndex(sample.size());
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array7.insert(sample[i]);
+		std::cout << utf8array7.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << utf8array7.getGapStart() << " New Index: " << index << " Gap size: " << utf8array7.getGapSize() << " Tail Start:" << utf8array7.getTailStart() << " Last Index: " << utf8array7.getLastIndex() << " Array Length: " << utf8array7.getArrayLength() << " Buffer Length: " << utf8array7.getBufferSize() << std::endl;
+		utf8array7.setCursorPosition(index);
+		utf8array7.remove();
+		utf8array7.remove();
+		utf8array7.remove();
+		utf8array7.remove();
+		utf8array7.remove();
+		std::cout << "Removing characters:" << std::endl;
+		std::cout << utf8array7.getVisibleText() << std::endl;
+		index = getRandomIndex(sample.size());
+		std::cout << "Current Index: " << utf8array7.getGapStart() << " New Index: " << index << " Gap size: " << utf8array7.getGapSize() << " Tail Start:" << utf8array7.getTailStart() << " Last Index: " << utf8array7.getLastIndex() << " Array Length: " << utf8array7.getArrayLength() << " Buffer Size: " << utf8array7.getBufferSize() << std::endl;
+		utf8array7.setCursorPosition(index);
+		for (size_t i = 0; i < other.size(); i++)
+			utf8array7.insert(other[i]);
+		std::cout << "String with second string inserted" << std::endl;
+		std::cout << utf8array7.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -193,6 +297,32 @@ int main()
 		std::cout << array8.getVisibleText() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
+
+		utf8GapBuffer utf8array8;
+		std::string other = "Peanut butter jelly time!";
+		std::cout << "Sample Size: " << sample.size() << " Other Size: " << other.size() << std::endl;
+		size_t	index = getRandomIndex(sample.size());
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array8.insert(sample[i]);
+		std::cout << utf8array8.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << utf8array8.getGapStart() << " New Index: " << index << " Gap size: " << utf8array8.getGapSize() << " Tail Start:" << utf8array8.getTailStart() << " Last Index: " << utf8array8.getLastIndex() << " Array Length: " << utf8array8.getArrayLength() <<  " Buffer Size: " << utf8array8.getBufferSize() << std::endl;
+		utf8array8.setCursorPosition(index);
+		for (size_t i = 0; i < other.size(); i++)
+			utf8array8.insert(other[i]);
+		std::cout << "String with second string inserted" << std::endl;
+		std::cout << utf8array8.getVisibleText() << std::endl;
+		index = getRandomIndex(sample.size());
+		std::cout << "Current Index: " << utf8array8.getGapStart() << " New Index: " << index << " Gap size: " << utf8array8.getGapSize() << " Tail Start:" << utf8array8.getTailStart() << " Last Index: " << utf8array8.getLastIndex() << " Array Length: " << utf8array8.getArrayLength() << " Buffer Size: " << utf8array8.getBufferSize() << std::endl;
+		utf8array8.setCursorPosition(index);
+		utf8array8.remove();
+		utf8array8.remove();
+		utf8array8.remove();
+		utf8array8.remove();
+		utf8array8.remove();
+		std::cout << "Removing characters:" << std::endl;
+		std::cout << utf8array8.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -214,6 +344,21 @@ int main()
 		std::cout << array9.getVisibleText() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
+
+		utf8GapBuffer utf8array9;
+		std::string other = "Peanut butter jelly time!";
+		std::cout << "Sample Size: " << sample.size() << " Other Size: " << other.size() << std::endl;
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array9.insert(sample[i]);
+		std::cout << utf8array9.getVisibleText() << std::endl;
+		size_t	index = utf8array9.getVisibleText().size() + 5;
+		std::cout << "Current Index: " << utf8array9.getGapStart() << " New Index: " << index << " Gap size: " << utf8array9.getGapSize() << " Tail Start:" << utf8array9.getTailStart() << " Last Index: " << utf8array9.getLastIndex() << " Array Length: " << utf8array9.getArrayLength() << " Buffer Size: " << utf8array9.getBufferSize() << std::endl;
+		utf8array9.setCursorPosition(index);
+		for (size_t i = 0; i < other.size(); i++)
+			utf8array9.insert(other[i]);
+		std::cout << utf8array9.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -233,6 +378,21 @@ int main()
 		std::cout << "Current Index: " << array10.getGapStart() << " Gap size: " << array10.getGapSize() << " Tail Start:" << array10.getTailStart() << " Last Index: " << array10.getLastIndex() << " Array Length: " << array10.getArrayLength() << " Buffer Size: " << array10.getBufferSize() << std::endl;
 		array10.setCursorPosition(index);
 		std::cout << array10.getVisibleText() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+
+		utf8GapBuffer utf8array10;
+		std::cout << "Sample Size: " << sample.size() << std::endl;
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array10.insert(sample[i]);
+		std::cout << utf8array10.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << utf8array10.getGapStart() << " Gap size: " << utf8array10.getGapSize() << " Tail Start:" << utf8array10.getTailStart() << " Last Index: " << utf8array10.getLastIndex() << " Array Length: " << utf8array10.getArrayLength() << " Buffer Size: " << utf8array10.getBufferSize() << std::endl;
+		for (size_t i = 0; i < 60; i++)
+			utf8array10.remove();
+		size_t	index = 5;
+		std::cout << "Current Index: " << utf8array10.getGapStart() << " Gap size: " << utf8array10.getGapSize() << " Tail Start:" << utf8array10.getTailStart() << " Last Index: " << utf8array10.getLastIndex() << " Array Length: " << utf8array10.getArrayLength() << " Buffer Size: " << utf8array10.getBufferSize() << std::endl;
+		utf8array10.setCursorPosition(index);
+		std::cout << utf8array10.getVisibleText() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
 	}
@@ -261,6 +421,26 @@ int main()
 		std::cout << "Current Index: " << array11.getGapStart() << " Gap size: " << array11.getGapSize() << " Tail Start:" << array11.getTailStart() << " Last Index: " << array11.getLastIndex() << " Array Length: " << array11.getArrayLength() << " Buffer Size: " << array11.getBufferSize() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
+
+		utf8GapBuffer utf8array11;
+		std::string other = "Peanut butter jelly time!";
+		std::cout << "Sample Size: " << sample.size() << " Other Size: " << other.size() << std::endl;
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array11.insert(sample[i]);
+		std::cout << utf8array11.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << utf8array11.getGapStart() << " Gap size: " << utf8array11.getGapSize() << " Tail Start:" << utf8array11.getTailStart() << " Last Index: " << utf8array11.getLastIndex() << " Array Length: " << utf8array11.getArrayLength() << " Buffer Size: " << utf8array11.getBufferSize() << std::endl;
+		for (size_t i = 0; i < 60; i++)
+			utf8array11.remove();
+		size_t	index = 5;
+		std::cout << "Current Index: " << utf8array11.getGapStart() << " Gap size: " << utf8array11.getGapSize() << " Tail Start:" << utf8array11.getTailStart() << " Last Index: " << utf8array11.getLastIndex() << " Array Length: " << utf8array11.getArrayLength() << " Buffer Size: " << utf8array11.getBufferSize() << std::endl;
+		utf8array11.setCursorPosition(index);
+		std::cout << utf8array11.getVisibleText() << std::endl;
+		for (size_t i = 0; i < other.size(); i++)
+			utf8array11.insert(other[i]);
+		std::cout << utf8array11.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << utf8array11.getGapStart() << " Gap size: " << utf8array11.getGapSize() << " Tail Start:" << utf8array11.getTailStart() << " Last Index: " << utf8array11.getLastIndex() << " Array Length: " << utf8array11.getArrayLength() << " Buffer Size: " << utf8array11.getBufferSize() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
 	}
 	catch (std::exception &e)
 	{
@@ -285,6 +465,26 @@ int main()
 			array12.insert(other[i]);
 		std::cout << array12.getVisibleText() << std::endl;
 		std::cout << "Current Index: " << array12.getGapStart() << " Gap size: " << array12.getGapSize() << " Tail Start:" << array12.getTailStart() << " Last Index: " << array12.getLastIndex() << " Array Length: " << array12.getArrayLength() << " Buffer Size: " << array12.getBufferSize() << std::endl;
+		std::cout << std::endl;
+		std::cout << std::endl;
+
+		utf8GapBuffer utf8array12;
+		std::string other = "Peanut butter jelly time!";
+		std::cout << "Sample Size: " << sample.size() << " Other Size: " << other.size() << std::endl;
+		for (size_t i = 0; i < sample.size(); i++)
+			utf8array12.insert(sample[i]);
+		std::cout << utf8array12.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << utf8array12.getGapStart() << " Gap size: " << utf8array12.getGapSize() << " Tail Start:" << utf8array12.getTailStart() << " Last Index: " << utf8array12.getLastIndex() << " Array Length: " << utf8array12.getArrayLength() << " Buffer Size: " << utf8array12.getBufferSize() << std::endl;
+		for (ssize_t i = static_cast<ssize_t>(utf8array12.getArrayLength()); i > -1; i--)
+			utf8array12.remove();
+		size_t	index = 5;
+		std::cout << "Current Index: " << utf8array12.getGapStart() << " Gap size: " << utf8array12.getGapSize() << " Tail Start:" << utf8array12.getTailStart() << " Last Index: " << utf8array12.getLastIndex() << " Array Length: " << utf8array12.getArrayLength() << " Buffer Size: " << utf8array12.getBufferSize() << std::endl;
+		utf8array12.setCursorPosition(index);
+		std::cout << utf8array12.getVisibleText() << std::endl;
+		for (size_t i = 0; i < other.size(); i++)
+			utf8array12.insert(other[i]);
+		std::cout << utf8array12.getVisibleText() << std::endl;
+		std::cout << "Current Index: " << utf8array12.getGapStart() << " Gap size: " << utf8array12.getGapSize() << " Tail Start:" << utf8array12.getTailStart() << " Last Index: " << utf8array12.getLastIndex() << " Array Length: " << utf8array12.getArrayLength() << " Buffer Size: " << utf8array12.getBufferSize() << std::endl;
 		std::cout << std::endl;
 		std::cout << std::endl;
 	}
