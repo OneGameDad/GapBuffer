@@ -1,17 +1,15 @@
 #pragma once
 
-#include <algorithm>
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <exception>
-#include <stdexcept>
 #include <string>
-#include <iostream>
-#include <filesystem>
 #include <cstring>
+#include <vector>
+#include <cstddef>
 #include <utility>
-#include <memory>
+#include <stdexcept>
+#include <algorithm>
 
 #define STARTING_BUFFER_SIZE	10
 #define GAP_SIZE	6
@@ -47,7 +45,7 @@ private:
 	void	cleanGap();
 public:
 	utf8GapBuffer();
-	utf8GapBuffer(std::u8string &newContent);
+	utf8GapBuffer(const std::u8string &newContent);
 	~utf8GapBuffer();
 	utf8GapBuffer(const utf8GapBuffer &copy);
 	utf8GapBuffer &operator=(const utf8GapBuffer &copy);
@@ -56,7 +54,7 @@ public:
 
 
 	//Getters
-	std::string	getVisibleText() const;
+	std::string	toStdString() const;
 	std::u8string	getVisibleU8Text() const;
 	size_t	getGapSize() const;
 	size_t	getLastIndex() const;

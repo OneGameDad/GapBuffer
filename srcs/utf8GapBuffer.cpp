@@ -1,6 +1,4 @@
 #include "../includes/utf8GapBuffer.hpp"
-#include <cstddef>
-#include <utility>
 
 utf8GapBuffer::utf8GapBuffer()
 	: bufferSize_(STARTING_BUFFER_SIZE), gapStart_(0), arrayLength_(0), arrayLastIndex_(0)
@@ -10,12 +8,11 @@ utf8GapBuffer::utf8GapBuffer()
 	tailStart_ = setTailStart(GAP_SIZE);
 }
 
-utf8GapBuffer::utf8GapBuffer(std::u8string &newContent)
-	: gapStart_(0), arrayLength_(0), arrayLastIndex_(0)
+utf8GapBuffer::utf8GapBuffer(const std::u8string &newContent)
+	: bufferSize_(newContent.size() + 1 + GAP_SIZE), gapStart_(0), arrayLength_(0), arrayLastIndex_(0)
 {
-	size_t size = newContent.size() + 1 + GAP_SIZE;
-	buffer_ = new char8_t[size];
-	zeroOutBuffer(buffer_, size);
+	buffer_ = new char8_t[bufferSize_];
+	zeroOutBuffer(buffer_, bufferSize_);
 	tailStart_ = setTailStart(GAP_SIZE);
 	for (size_t i = 0; i < newContent.size(); i++)
 		insert(newContent[i]);
@@ -29,8 +26,10 @@ utf8GapBuffer::~utf8GapBuffer()
 }
 
 utf8GapBuffer::utf8GapBuffer(const utf8GapBuffer &copy)
+	: bufferSize_(copy.bufferSize_), gapStart_(copy.gapStart_), tailStart_(copy.tailStart_), arrayLength_(copy.arrayLength_), arrayLastIndex_(copy.arrayLastIndex_)
 {
-	*this = copy;
+	buffer_ = new char8_t[bufferSize_];
+	std::copy(copy.buffer_, copy.buffer_ + copy.bufferSize_, buffer_);
 }
 
 utf8GapBuffer	&utf8GapBuffer::operator=(const utf8GapBuffer &copy)
@@ -38,7 +37,8 @@ utf8GapBuffer	&utf8GapBuffer::operator=(const utf8GapBuffer &copy)
 if (this != &copy)
 	{
 		delete [] buffer_;
-		buffer_ = copy.buffer_;
+		buffer_ = new char8_t[copy.bufferSize_];
+		std::copy(copy.buffer_, copy.buffer_ + copy.bufferSize_, buffer_);
 		bufferSize_ = copy.bufferSize_;
 		gapStart_ = copy.gapStart_;
 		tailStart_ = copy.tailStart_;
@@ -177,13 +177,13 @@ void utf8GapBuffer::moveBytesToHigherIndices(size_t newIndex)
 	size_t bytesToMove = gapStart_ - newIndex;
 	size_t newTailStart = tailStart_ - bytesToMove;
 	assert(newTailStart == newIndex + gapSize);
-	char tempArray[bytesToMove + 1];
+	std::vector<char8_t> tempArray(bytesToMove + 1);
 	for (size_t i = newIndex, j = 0; i < gapStart_ && j < bytesToMove + 1; i++, j++)
 	{
 		tempArray[j] = buffer_[i];
-		buffer_[i] = '\0';
+		buffer_[i] = u8'\0';
 	}
-	tempArray[bytesToMove] = '\0';
+	tempArray[bytesToMove] = u8'\0';
 	for (size_t i = newTailStart, j = 0; j < bytesToMove; i++, j++)
 			buffer_[i] = tempArray[j];
 	gapStart_ = newIndex;
@@ -206,13 +206,13 @@ void utf8GapBuffer::moveBytesToLowerIndices(size_t newIndex)
 		bytesToMove = newIndex - tailStart_;
 	else
 		bytesToMove = tailStart_ - newIndex;
-	char tempArray[bytesToMove + 1];
+	std::vector<char8_t> tempArray(bytesToMove + 1);
 	for (size_t i = tailStart_, j = 0; i < newIndex; i++, j++)
 	{
 		tempArray[j] = buffer_[i];
-		buffer_[i] = '\0';
+		buffer_[i] = u8'\0';
 	}
-	tempArray[bytesToMove] = '\0';
+	tempArray[bytesToMove] = u8'\0';
 	for (size_t i = gapStart_, j = 0; j < bytesToMove; i++, j++)
 		buffer_[i] = tempArray[j];
 	gapStart_ = gapStart_ + bytesToMove;
@@ -229,13 +229,13 @@ void utf8GapBuffer::shiftTailBytesToHigherIndices(size_t newGapSize, size_t tail
 	assert((gapStart_ + newGapSize + tailSize) < bufferSize_);
 	size_t n = arrayLastIndex_ - tailStart_;
 	assert(getTailSize() != tailDiff);
-	char tempArray[n + 1];
+	std::vector<char8_t> tempArray(n + 1);
 	for (size_t i = tailStart_, j = 0; i <= arrayLastIndex_; i++, j++)
 	{
 		tempArray[j] = buffer_[i];
-		buffer_[i] = '\0';
+		buffer_[i] = u8'\0';
 	}
-	tempArray[n] = '\0';
+	tempArray[n] = u8'\0';
 	for (size_t i = newTailStart, j = 0; j < n; i++, j++)
 		buffer_[i] = tempArray[j];
 	tailStart_ = newTailStart;
@@ -262,7 +262,7 @@ void	utf8GapBuffer::resizeGap()
 {
 	size_t newGapSize = GAP_SIZE;
 	size_t tailSize = getTailSize();
-	if (tailSize != 0 || (gapStart_ + newGapSize + tailSize >= bufferSize_ - 1))
+	if (tailSize == 0 || (gapStart_ + newGapSize + tailSize >= bufferSize_ - 1))
 	{
 		resizeBuffer();
 		return ;
@@ -290,14 +290,14 @@ void	utf8GapBuffer::growGap()
 void	utf8GapBuffer::cleanGap()
 {
 	for (size_t i = gapStart_; i < tailStart_; i++)
-		buffer_[i] = '\0';
+		buffer_[i] = u8'\0';
 }
 
-std::string	utf8GapBuffer::getVisibleText() const
+std::string	utf8GapBuffer::toStdString() const
 {
 	std::u8string visible;
 	if (arrayLength_ == 0)
-		return (visible);
+		return (std::string());
 	size_t count = 0;
 	for(size_t i = 0; i < bufferSize_; i++)
 	{
@@ -361,7 +361,9 @@ void	utf8GapBuffer::deleteSelection(size_t start, size_t end)
 	if (start > end)
 		std::swap(start, end);
 	setCursorPosition(end);
-	for (size_t i = end; i >= start; i--)
+
+	size_t count = end - start;
+	for (size_t i = 0; i < count; i++)
 		remove();
 }
 
