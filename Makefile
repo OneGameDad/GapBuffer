@@ -21,7 +21,7 @@ WHITE := \033[0;97m
 CC := g++
 RM := rm -rf
 
-SRCS_FILES := main.cpp GapBuffer.cpp
+SRCS_FILES := main.cpp GapBuffer.cpp utf8GapBuffer.cpp
 
 # Detect Platform
 UNAME_S := $(shell uname -s)
