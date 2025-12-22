@@ -22,8 +22,11 @@ private:
 	size_t	bufferSize_;
 	size_t	gapStart_;
 	size_t	tailStart_;
-	size_t	arrayLength_;
-	size_t	arrayLastIndex_;
+	size_t	tailEnd_;
+	size_t	byteCount_;
+	size_t	byteLastIndex_;
+	size_t	charCount_;
+	size_t	charLastIndex_;
 
 	//Buffer
 	bool	isBufferFull();
@@ -36,14 +39,17 @@ private:
 	void	shiftTailBytesToHigherIndices(size_t newGapSize, size_t tailSize);
 	//Gap
 	size_t	setTailStart(size_t newSize);
-	size_t	getTailSize();
-	void	calculateArrayLength();
-	void	calculateArrayLastIndex();
+	size_t	getTailByteSize();
+	void	calculateByteCount();
+	void	calculateByteLastIndex();
+	void	calculateCharCount();
+	void	calculateCharLastIndex();
 	void	relocateGapTo(size_t newIndex);
 	void	resizeGap();
 	void	shrinkGap();
 	void	growGap();
 	void	cleanGap();
+	void	assertInvariants() const;
 public:
 	GapBuffer();
 	GapBuffer(std::string &newContent);
@@ -57,11 +63,14 @@ public:
 	//Getters
 	std::string	getVisibleText() const;
 	size_t	getGapSize() const;
-	size_t	getLastIndex() const;
+	size_t	getLastByteIndex() const;
 	size_t	getTailStart() const;
-	size_t	getArrayLength() const;
+	size_t	getTailEnd() const;
+	size_t	getByteCount() const;
 	size_t	getGapStart() const;
 	size_t	getBufferSize() const;
+	size_t	getCharCount() const;
+	size_t	getLastCharIndex() const;
 
 	//Writing
 	void	insert(char ch);
