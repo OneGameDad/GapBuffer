@@ -10,9 +10,9 @@ I created this as the first project in a series of portfolio pieces, which are i
 
 Gap Buffers were developed to minimize the number of copy and/or move operations a computer must perform, as they were slow and thus costly (this is not the case with modern computers). Their design takes into account how humans interact with a text editor, as they are often inserting and/or removing text at a certain point for a while, before jumping elsewhere in the text do more insert and/or remove operations. Humans usually don't jump around the buffer doing many small operations quickly.
 
-## Version 1.0
+## Version 1.1
 
-This is the core version of the gap buffer with no additional optimizations or extra functionality. 
+The core version has been extended to include a utf-8 compatible version of the gap buffer. As a result the ASCII-version has been updated to be in line in terms of functions and variable naming so it matches utf8GapBuffer.
 
 ### Possible Future Features
 
@@ -25,8 +25,12 @@ This version is compatiable with c++20 and was tested and compiled with g++.
 Download the repository and use the following in your project:
 ```c++
 #include <GapBuffer.hpp>
+
+or
+
+#include <utf8GapBuffer.hpp>
 ```
-Don't forget to use GapBuffer.cpp in your sources. 
+Don't forget to use GapBuffer.cpp or utf8GapBuffer.cpp in your sources. 
 
 ### Testing
 
